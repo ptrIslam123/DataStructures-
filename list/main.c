@@ -3,29 +3,38 @@
 #include "heder/test.h"
 
 
+void* alloc(size_t s)
+{
+    printf("allocate %d bytes\n", s);
+    return malloc(s);
+}
 
+void dealloc(void* p)
+{
+    printf("deallocate\n");
+    free(p);
+}
 
 int main()
 {
-    int size = 10;
-    list_t* list = make_list();
+    list_t* list = make_list(alloc, dealloc);
 
-
-    for (int i = 0; i < size; ++i)
+    for (int i = 0; i < 10; ++i)
     {
-        int *v = malloc(sizeof(int));
-        *v = i;
+        int* v = malloc(sizeof(int));
+        *v =i;
 
-        push_back(list, v);
+        push_back_to_list(list, v);
     }
 
-    list_iterator_t i = list->begin;
-    test_print_node(i);
 
-    list_iterator_t j = incr_list_itr(i);
+    for (list_iterator_t* i = list->begin; i != NULL; incr_list_itr(&i))
+    {
+        printf("key = %d\n", GET_LK(int, i));
+    }
+    
 
-    test_print_node(i);
-    test_print_node(j);
+    delete_list_struct(list);
 
     return 0;
 }

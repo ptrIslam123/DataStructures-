@@ -15,8 +15,10 @@ struct node;
 struct list_iterator;
 
 typedef void* value_t;
-typedef struct node* list_iterator_t;
+typedef struct node list_iterator_t;
 
+typedef void* (*allocator_t)(size_t);
+typedef void (*deallocator_t)(void*);
 
 
 
@@ -25,6 +27,9 @@ typedef struct list
     struct node*    begin;
     struct node*    end;
     size_t          size_list;
+
+    allocator_t     allocate;
+    deallocator_t   deallocate;
 
 } list_t;
 
@@ -38,23 +43,29 @@ typedef struct node
 } node_t;
 
 
+//      GET_LIST_KEY
+#define GET_LK(T, list_itr) (*(T*)list_itr->key) 
 
-list_iterator_t begin_itr_list(list_t* );
-list_iterator_t end_itr_list(list_t* );
-list_iterator_t            incr_list_itr(list_iterator_t );
-void            decr_list_itr(list_iterator_t );
+
+void            incr_list_itr(list_iterator_t** );
+void            decr_list_itr(list_iterator_t** );
 
 
 unsigned char   is_empty_list(list_t* );    // true -> 1; false -> 0
-void            push_back(list_t* , void* );
-void            push_front(list_t* , void* );
-void            pop_back(list_t* );
-void            pop_front(list_t* );
+void            push_back_to_list(list_t* , void* );
+void            push_front_to_list(list_t* , void* );
+void            pop_back_from_list(list_t* );
+void            pop_front_from_list(list_t* );
 
-struct list*    make_list();
-struct node*    make_node(value_t );
+void            insert_to_list(list_t* , list_iterator_t* , void* );
+void            remove_from_list(list_t* , list_iterator_t* );
 
-void            free_node(struct node* );
+
+struct list*    make_std_list();
+struct list*    make_list(allocator_t , deallocator_t );
+struct node*    make_node(allocator_t , value_t );
+
+void            free_node(deallocator_t , struct node* );
 void            free_list_struct(struct list* );
 void            clear_list(struct list* );
 void            delete_list_struct(struct list* );

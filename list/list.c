@@ -3,37 +3,22 @@
 
 
 inline
-list_iterator_t 
-begin_itr_list(list_t* list)
+void            
+incr_list_itr(list_iterator_t** itr)
 {
-    return list->begin;
+    *itr = (*itr)->next_node;
 }
-
 
 inline
-list_iterator_t 
-end_itr_list(list_t* list)
+void            
+decr_list_itr(list_iterator_t** itr)
 {
-    return list->end->next_node;
-}
-
-
-inline
-list_iterator_t            
-incr_list_itr(list_iterator_t itr)
-{
-    itr = itr->next_node;
-    return itr;
+    *itr = (*itr)->prev_node;
 }
 
 
 
-inline
-void 
-decr_list_itr(list_iterator_t itr)
-{
-    itr = itr->prev_node;
-}
+
 
 
 
@@ -46,9 +31,9 @@ is_empty_list(list_t* list)
 }
 
 void            
-push_back(list_t* list, void* k)
+push_back_to_list(list_t* list, void* k)
 {
-    node_t* new_node = make_node(k);
+    node_t* new_node = make_node(list->allocate, k);
 
     if (is_empty_list(list) == IS_NOT_EMPTY)
     {
@@ -66,9 +51,9 @@ push_back(list_t* list, void* k)
 
 
 void            
-push_front(list_t* list, value_t k)
+push_front_to_list(list_t* list, value_t k)
 {
-    node_t* new_node = make_node(k);
+    node_t* new_node = make_node(list->allocate, k);
 
     if (is_empty_list(list) == IS_NOT_EMPTY)
     {
@@ -86,7 +71,7 @@ push_front(list_t* list, value_t k)
 
 
 void           
-pop_back(list_t* list)
+pop_back_from_list(list_t* list)
 {
     if (is_empty_list(list) == IS_NOT_EMPTY)
         return;
@@ -95,13 +80,13 @@ pop_back(list_t* list)
     list->end   = tmp->prev_node;
     list->end->next_node = NULL;
 
-    free_node(tmp);
+    free_node(list->deallocate, tmp);
     list->size_list--;
 }
 
 
 void           
-pop_front(list_t* list)
+pop_front_from_list(list_t* list)
 {
     if (is_empty_list(list) == IS_NOT_EMPTY)
         return;
@@ -109,14 +94,57 @@ pop_front(list_t* list)
     node_t* tmp = list->begin;
     list->begin = tmp->next_node;
 
-    free_node(tmp);
+    free_node(list->deallocate, tmp);
     list->size_list--;
 }
 
 
 
+
+void            
+insert_to_list(list_t* list, list_iterator_t* itr, void* k)
+{
+    node_t* new_node = make_node(list->allocate, k);
+
+    new_node->next_node = itr->next_node;
+    itr->prev_node      = new_node;
+
+    itr->next_node      = new_node;
+    new_node->prev_node = itr;
+
+    list->size_list++;
+}
+
+
+void            
+remove_from_list(list_t* list, list_iterator_t* itr)
+{
+    if (!list->size_list)
+        return;
+    
+    if (itr == list->begin)
+    {
+        pop_front_from_list(list);
+    }
+    else if (itr == list->end)
+    {
+        pop_back_from_list(list);
+    }
+    else
+    {
+        (itr->prev_node)->next_node = itr->next_node;
+        (itr->next_node)->prev_node = itr->prev_node;
+
+        free_node(list->deallocate, itr);
+
+        list->size_list--;  
+    }
+}
+
+
+
 struct list*    
-make_list()
+make_std_list()
 {
     struct list* new_list = malloc(SIZE_STRCUT_LIST);
 
@@ -124,14 +152,35 @@ make_list()
     new_list->end       = NULL;
     new_list->size_list = 0;
 
+    new_list->allocate      = malloc;
+    new_list->deallocate    = free;
+
     return new_list;
 }
 
 
-struct node*    
-make_node(value_t k)
+struct list*    
+make_list(allocator_t alloc, deallocator_t dealloc)
 {
-    struct node* new_node = malloc(SIZE_STRUCT_NODE);
+    struct list* new_list = malloc(SIZE_STRCUT_LIST);
+
+    new_list->begin     = NULL;
+    new_list->end       = NULL;
+    new_list->size_list = 0;
+
+    new_list->allocate      = alloc;
+    new_list->deallocate    =  dealloc;
+
+    return new_list;
+}
+
+
+
+
+struct node*    
+make_node(allocator_t allocate, value_t k)
+{
+    struct node* new_node = allocate(SIZE_STRUCT_NODE);
 
     new_node->next_node = NULL;
     new_node->next_node = NULL;
@@ -144,9 +193,9 @@ make_node(value_t k)
 
 inline
 void            
-free_node(struct node* in)
+free_node(deallocator_t deallocate, struct node* in)
 {
-    free(in);
+    deallocate(in);
     in = NULL;
 }
 
@@ -155,7 +204,7 @@ inline
 void            
 free_list_struct(struct list* list)
 {
-    free(list);
+    list->deallocate(list);
     list = NULL;
 }
 
@@ -166,7 +215,7 @@ clear_list(struct list* list)
 {
     while (list->begin != NULL)
     {
-        pop_front(list);
+        pop_front_from_list(list);
     }
 }
 

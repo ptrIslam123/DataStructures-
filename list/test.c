@@ -4,7 +4,7 @@
 
 #include "heder/test.h"
 
-
+/* 
 
 void 
 test_main(int* data, int size)
@@ -139,3 +139,5 @@ test_print_list(list_t* list)
         item = item->next_node;
     }
 }
+
+*/
