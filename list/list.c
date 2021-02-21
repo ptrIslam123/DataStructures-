@@ -1,5 +1,66 @@
 #include "heder/list.h"
+#include "heder/private_list_ip.h"
+#include <stdio.h>
 
+void            
+swap_list(list_t* first, list_t* second)
+{
+    list_iterator_t* fbeg   = first->begin;
+    first->begin            = second->begin;
+    second->begin           = fbeg;
+}
+
+
+
+
+
+inline
+list_iterator_t*    
+rbegin_list(list_t* list)
+{
+    return list->end;
+}
+
+
+inline
+list_iterator_t*    
+rend_list(list_t* list)
+{
+    return NULL;    // list->begin->prev_node <-> NULL
+}
+
+
+inline
+list_iterator_t*    
+begin_list(list_t* list)
+{
+    return list->begin;
+}
+
+
+inline
+list_iterator_t*    
+end_list(list_t* list)
+{
+    return NULL;    // list->end->next_node <-> NULL;
+}
+
+
+
+
+inline
+void            
+rincr_list_itr(rlist_iterator_t** ritr)
+{
+    decr_list_itr(ritr);
+}
+
+inline
+void            
+rdecr_list_itr(rlist_iterator_t** ritr)
+{
+    incr_list_itr(ritr);
+}
 
 
 inline
@@ -9,14 +70,13 @@ incr_list_itr(list_iterator_t** itr)
     *itr = (*itr)->next_node;
 }
 
+
 inline
 void            
 decr_list_itr(list_iterator_t** itr)
 {
     *itr = (*itr)->prev_node;
 }
-
-
 
 
 
@@ -101,16 +161,51 @@ pop_front_from_list(list_t* list)
 
 
 
+inline
+list_iterator_t*         
+get_front_from_list(list_t* list)
+{
+    if (!list->size_list)
+        return NULL;
+
+    return list->begin;
+}
+
+
+inline
+list_iterator_t*         
+get_back_from_list(list_t* list)
+{
+    if (!list->size_list)
+        return NULL;
+
+    return list->end;
+}
+
+
+
+
 void            
 insert_to_list(list_t* list, list_iterator_t* itr, void* k)
 {
     node_t* new_node = make_node(list->allocate, k);
 
-    new_node->next_node = itr->next_node;
-    itr->prev_node      = new_node;
+    if (itr != list->begin)
+    {
+        node_t* prev        = itr->prev_node;
 
-    itr->next_node      = new_node;
-    new_node->prev_node = itr;
+        prev->next_node     = new_node;
+        new_node->prev_node = prev;
+
+        new_node->next_node = itr;
+        itr->prev_node      = new_node;
+    }
+    else
+    {
+        new_node->next_node = itr;
+        itr->prev_node      = new_node;
+        list->begin         = new_node;    
+    }
 
     list->size_list++;
 }
@@ -177,52 +272,9 @@ make_list(allocator_t alloc, deallocator_t dealloc)
 
 
 
-struct node*    
-make_node(allocator_t allocate, value_t k)
-{
-    struct node* new_node = allocate(SIZE_STRUCT_NODE);
-
-    new_node->next_node = NULL;
-    new_node->next_node = NULL;
-    new_node->key       = k;
-
-    return new_node;
-}
-
-
-
 inline
 void            
-free_node(deallocator_t deallocate, struct node* in)
-{
-    deallocate(in);
-    in = NULL;
-}
-
-
-inline
-void            
-free_list_struct(struct list* list)
-{
-    list->deallocate(list);
-    list = NULL;
-}
-
-
-
-void            
-clear_list(struct list* list)
-{
-    while (list->begin != NULL)
-    {
-        pop_front_from_list(list);
-    }
-}
-
-
-inline
-void            
-delete_list_struct(struct list* list)
+free_list(struct list* list)
 {
     clear_list(list);
     free_list_struct(list);

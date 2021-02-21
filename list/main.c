@@ -3,38 +3,69 @@
 #include "heder/test.h"
 
 
-void* alloc(size_t s)
+#define print_list(T, L)                                    \
+            for (list_iterator_t*   i = begin_list(L);      \
+                            i != end_list(L);               \
+                            incr_list_itr(&i))              \
+            {                                               \
+                printf("k = %c\n", *GET_LK(T, i));           \
+            }                                                         
+
+
+
+
+typedef struct point
 {
-    printf("allocate %d bytes\n", s);
-    return malloc(s);
+    int x,y;
+} point_t;
+
+point_t* make_point(int _x, int _y)
+{
+    point_t* new_point = malloc(sizeof(point_t));
+
+    new_point->x = _x;
+    new_point->y = _y;
+
+    return new_point;
 }
 
-void dealloc(void* p)
+char* make_char(char c)
 {
-    printf("deallocate\n");
-    free(p);
+    char* nc = malloc(sizeof(char));
+    *nc = c;
+
+    return nc;
 }
 
 int main()
 {
-    list_t* list = make_list(alloc, dealloc);
+    const int size = 10;
+    list_t* listc = make_std_list();
+    list_t* listp = make_std_list();
 
-    for (int i = 0; i < 10; ++i)
+    for (int i = 0; i < size; ++i)
     {
-        int* v = malloc(sizeof(int));
-        *v =i;
+        point_t*    p = make_point(i, i + 10);
+        char*       c = make_char('$');
 
-        push_back_to_list(list, v);
+        push_back_to_list(listp, p);
+        push_back_to_list(listc, c);
     }
 
 
-    for (list_iterator_t* i = list->begin; i != NULL; incr_list_itr(&i))
+    for (list_iterator_t* i = rbegin_list(listp); i != rend_list(listp); rincr_list_itr(&i))
     {
-        printf("key = %d\n", GET_LK(int, i));
+       
+        int vx = (GET_LK(point_t, i))->x;
+
+        int vy = ((point_t*)i->key)->y;
+        printf("x = %d\t\ty = %d\n", vx, vy);
     }
+
+
+    swap_list(listc, listp);
+
     
-
-    delete_list_struct(list);
 
     return 0;
 }
