@@ -13,10 +13,15 @@
 struct tree;
 struct tree_node;
 
+
 typedef void* tree_value_t;
+typedef struct tree_node tree_iterator_t;
 typedef void* (*allocator_t)(size_t );
 typedef void (*deallocator_t)(void* );
 typedef unsigned char (*compare_t)(tree_value_t , tree_value_t );
+
+typedef void (*tree_func_t)(tree_iterator_t* );
+
 
 
 typedef struct tree
@@ -24,6 +29,7 @@ typedef struct tree
     struct tree_node*   root;
     allocator_t         allocate;
     deallocator_t       deallocate;
+    size_t              size_tree;
 
     compare_t           is_eq;
     compare_t           is_lt;
@@ -42,13 +48,24 @@ typedef struct tree_node
 } tree_node_t;
 
 
-unsigned char   is_empty_tree(tree_t* );
-void            insert_to_tree(tree_t* , tree_value_t );
 
-struct tree*    make_std_tree(compare_t is_eq, compare_t is_lt, compare_t is_gt);
-struct tree*    make_tree(allocator_t, deallocator_t , 
-                    compare_t is_eq, compare_t is_lt, compare_t is_gt);
+//      GET_TREE_KEY | KEY <-> DATA
+#define GET_TK(T, tree_itr) ((T*)tree_itr->data)
 
-void            free_tree(tree_t* );
+
+unsigned char       is_empty_tree(tree_t* );
+
+
+tree_iterator_t*    find_to_tree(tree_t* , tree_value_t );
+void                insert_to_tree(tree_t* , tree_value_t );
+
+
+void                for_each_tree(tree_t* , tree_func_t );
+
+struct tree*        make_std_tree(compare_t is_eq, compare_t is_lt, compare_t is_gt);
+struct tree*        make_tree(allocator_t, deallocator_t , 
+                        compare_t is_eq, compare_t is_lt, compare_t is_gt);
+
+void                free_tree_struct(tree_t* );
 
 #endif // !_TREE_H_
