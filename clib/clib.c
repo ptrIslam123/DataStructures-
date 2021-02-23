@@ -1,5 +1,5 @@
 #include "heder/clib.h"
-
+#include <stdio.h>
 
 
 struct part*    
@@ -25,6 +25,38 @@ free_part_struct(part_t* p)
     p = NULL;
 }
 
+
+
+
+
+/** struct init_list **/
+
+struct 
+init_list* make_init_list(void* args, ... )
+{
+    size_t size_data = *(size_t*)args;
+    args = args + sizeof(size_t);
+
+    size_t size_type = *(size_t*)args;
+    args = args + sizeof(size_t);
+
+    args = args + size_type;
+
+    struct init_list* list  = malloc(sizeof(init_list_t));
+    list->data              = malloc(size_data * size_type);
+    list->size_data         = size_data;
+    list->size_dataa_type   = size_type;
+
+    for (size_t i = 0; i < size_data; i++)
+    {
+        args = args + size_type;
+        //double v = *(double*)args;
+        //printf("v = %f\n", v);
+        list->data[i] = args;
+    }
+    
+    return list;
+}
 
 
 
