@@ -3,25 +3,14 @@
 
 #include "heder/tree.h"
 
-unsigned char cmp_eq(tree_value_t l, tree_value_t r)
-{
-    return *(int*)l == *(int*)r;
-}
-
-unsigned char cmp_lt(tree_value_t l, tree_value_t r)
-{
-    return *(int*)l < *(int*)r;
-}
-
-unsigned char cmp_gt(tree_value_t l, tree_value_t r)
-{
-    return *(int*)l > *(int*)r;
-}
 
 
-void print_tree_node(tree_iterator_t* itr)
+int count_m = 0;
+
+void print_tree_node(tree_t* tree, tree_iterator_t** itr, void** data)
 {
-    int v = *GET_TK(int, itr);
+    tree_iterator_t* i = *itr;
+    int v = *GET_TK(int, i);
 
     printf("%d\n", v);
 }
@@ -29,29 +18,28 @@ void print_tree_node(tree_iterator_t* itr)
 
 int main()
 {
-    const int size = 10;
-    
 
-    tree_t* tree = make_std_tree(cmp_eq, cmp_lt, cmp_gt);
+    
+    int arr[] = {5, 2 , 3, 4, 8, 6, 9, 1};
+    const int size = sizeof(arr)/sizeof(arr[0]);
+
+    tree_t* tree = make_std_tree(is_eqi, is_lessi, is_morei);
 
     for (int i = 0; i < size; ++i)
     {
         int* v = malloc(sizeof(int));
-        *v = i;
+        *v = arr[i];
         insert_to_tree(tree, v);
     }
 
-   
-    
-   for_each_tree(tree, print_tree_node);
-    
 
-
+    for_each_tree(tree, print_tree_node, NULL);
+    
     
 
-    
 
-    free_tree_struct(tree);
+    
+    
 
     return 0;
 }

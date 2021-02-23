@@ -1,5 +1,6 @@
 #include "heder/tree.h"
 #include "heder/private_tree_ip.h"
+#include <stdio.h>
 
 inline
 unsigned char   
@@ -13,6 +14,21 @@ is_empty_tree(tree_t* tree)
 
 
 
+inline
+tree_iterator_t*    
+get_min_to_tree(tree_t* tree)
+{
+    return find_min_node_to_tree(tree->root);
+}
+
+
+inline
+tree_iterator_t*    
+get_max_to_tree(tree_t* tree)
+{
+    return find_max_node_to_tree(tree->root);
+}
+
 
 tree_iterator_t*    
 find_to_tree(tree_t* tree, tree_value_t data)
@@ -24,19 +40,84 @@ find_to_tree(tree_t* tree, tree_value_t data)
 void            
 insert_to_tree(tree_t* tree, tree_value_t data)
 {
-    insert_node_to_tree(tree, &(tree->root), 
-        make_tree_node(tree->allocate, data)
-    );
+     tree_node_t* new_node = make_tree_node(tree->allocate, data);
+
+    if (is_empty_tree(tree))
+    {
+        tree->root = new_node;
+        tree->root->parent = new_node;
+    }
+    else
+    {
+        insert_node_to_tree(tree, &(tree->root), &new_node);   
+    }
+
+    tree->size_tree++;
 }
 
 
 
 
+void                
+remove_by_ptr_to_tree(tree_t* tree, tree_iterator_t* root)
+{
+    tree_node_t* target = root;
+    tree_node_t* parent = target->parent;
+
+    if (target->left_node != NULL && target->right_node != NULL)
+    {
+        tree_node_t* local_max_node = find_max_node_to_tree(target->left_node);
+        target->data = local_max_node->data;
+        remove_by_ptr_to_tree(tree, local_max_node);
+        return;
+    }
+    else if (target->left_node != NULL && target->right_node == NULL)
+    {
+        if (target == parent->left_node)
+        {
+            parent->left_node = target->left_node;
+        }
+        else
+        {
+            parent->right_node = target->left_node;
+        }
+    }
+    else if (target->right_node != NULL && target->left_node == NULL)
+    {
+        if (target == parent->right_node)
+        {
+            parent->right_node = target->right_node;
+        }
+        else
+        {
+            parent->left_node = target->right_node;
+        }
+    }
+    else
+    {
+        if (target == parent->left_node)
+        {
+            parent->left_node = NULL;
+        }   
+        else
+        {
+            parent->right_node = NULL;
+        }
+    }
+    free_tree_node(tree->deallocate, &target);
+    tree->size_tree--;
+}
+
+
+
 
 void                
-for_each_tree(tree_t* tree, tree_func_t do_something)
+for_each_tree(tree_t* tree, tree_func_t do_something, void** data)
 {
-    for_each_node_to_tree(tree->root, do_something);
+    if (tree != NULL)
+    {
+        for_each_node_to_tree(tree, tree->root, do_something, data);
+    }
 }
 
 
@@ -51,8 +132,8 @@ make_std_tree(compare_t is_eq, compare_t is_lt, compare_t is_gt)
     new_tree->size_tree     = 0;
 
     new_tree->is_eq         = is_eq;
-    new_tree->is_lt         = is_lt;
-    new_tree->is_gt         = is_gt;
+    new_tree->is_less       = is_lt;
+    new_tree->is_more       = is_gt;
 
     return new_tree;
 }
@@ -71,8 +152,8 @@ make_tree(allocator_t allocate, deallocator_t deallocate,
     new_tree->size_tree     = 0;
 
     new_tree->is_eq         = is_eq;
-    new_tree->is_lt         = is_lt;
-    new_tree->is_gt         = is_gt;
+    new_tree->is_less       = is_lt;
+    new_tree->is_more       = is_gt;
 
     return new_tree;
 }
@@ -81,6 +162,29 @@ make_tree(allocator_t allocate, deallocator_t deallocate,
 void            
 free_tree_struct(tree_t* tree)
 {
+    //for_each_node_to_tree(tree, tree->root, clear_node_to_tree ,NULL);
+
     tree->deallocate(tree);
     tree = NULL;
+}
+
+
+
+
+unsigned char 
+is_eqi(const tree_value_t root, const tree_value_t other)
+{
+    return *(int*)root == *(int*)other;
+}
+
+unsigned char 
+is_lessi(const  tree_value_t root, const tree_value_t other)
+{
+    return *(int*)root < *(int*)other;
+}
+
+unsigned char 
+is_morei(const tree_value_t root, const tree_value_t other)
+{
+    return *(int*)root > *(int*)other;
 }
