@@ -52,9 +52,9 @@ pop_from_stack(stack_t* stack)
 
 inline
 stack_value_t       
-get_top(stack_t* stack)
+get_top_to_stack(stack_t* stack)
 {
-    return get_back_from_list(stack->container);
+    return get_back_from_list(stack->container)->key;
 }
 
 
