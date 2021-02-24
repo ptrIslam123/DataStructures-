@@ -1,6 +1,8 @@
 #include "heder/clib.h"
 #include <stdio.h>
 
+#define _TEST_
+
 
 struct part*    
 make_part(value_part_t first, value_part_t second)
@@ -31,6 +33,27 @@ free_part_struct(part_t* p)
 
 /** struct init_list **/
 
+struct init_list* make_init_list(size_t size, int arg, ... )
+{   
+    int* arr = malloc(sizeof(int) * size);
+    int* itr = &arg;
+
+    for (int i = 0; i < size; ++i, ++itr)
+    {
+        arr[i] = *itr;
+    }
+
+    struct init_list* list  = malloc(sizeof(init_list_t));
+
+    list->data              = arr;
+    list->size_data         = size;
+    list->size_dataa_type   = sizeof(int);
+
+    return list;
+}
+
+#ifndef _TEST_
+
 struct 
 init_list* make_init_list(void* args, ... )
 {
@@ -58,6 +81,7 @@ init_list* make_init_list(void* args, ... )
     return list;
 }
 
+#endif // !_TEST_
 
 
 int* 

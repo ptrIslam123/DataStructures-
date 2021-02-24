@@ -32,7 +32,7 @@ void            free_part_struct(part_t* );
 
 
 
-typedef void** init_list_value_t;
+typedef void* init_list_value_t;
 typedef struct init_list
 {
     init_list_value_t   data;
@@ -41,19 +41,34 @@ typedef struct init_list
 
 } init_list_t;
 
-#define GET_INIT_LISTK(T, LIST, ITER) (T*)LIST->data[ITER]
-#define PRINT_INIT_LIST(T, LIST, FORMAT)                                \
-            for (int i = 0; i < LIST->size_data; i++)           \
-            {                                                   \
-                printf(FORMAT, *GET_INIT_LISTK(T, LIST, i));    \
-            }   
+struct init_list* make_init_list(size_t size, int arg, ... );
 /*
-    Данный метод может корретно с типами данных {
-        int, float
-    }
+    Данный макрос позволяет эмулирует поведение шаблонов (template) c++.
+    При вызове данного макроса с указанным типом генерирует находящуюся
+    внутри него функции но с указанным типом вместо всех (T), а также
+    вшивает в имя функции сам переданый тип данных (эмулирование декорирования имен).
+    но почемуто корретно работает только для типа int (в чем проблема не знаю!).
 */
-struct init_list*   make_init_list(void* args, ... );
-
+#define MAKE_INIT_LIST(T)                                               \
+        struct init_list* make_init_list_##T(size_t size, T arg, ... )  \
+        {                                                               \
+            T* arr = malloc(sizeof(T) * size);                          \
+            T* itr = &arg;                                              \
+                                                                        \
+            for (int i = 0; i < size; ++i, ++itr)                       \
+            {                                                           \
+                arr[i] = *itr;                                          \
+            }                                                           \
+                                                                        \
+            struct init_list* list  = malloc(sizeof(init_list_t));      \
+                                                                        \
+            list->data              = arr;                              \
+            list->size_data         = size;                             \
+                                                                        \
+            list->size_dataa_type   = sizeof(T);                        \
+                                                                        \
+            return list;                                                \
+        }
 
 
 
