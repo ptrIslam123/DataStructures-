@@ -20,7 +20,7 @@ void                swap_stack(stack_t* , stack_t* );
 void                push_to_stack(stack_t* , stack_value_t );
 stack_value_t       pop_from_stack(stack_t* );
 
-stack_value_t       get_top(stack_t* );
+stack_value_t       get_top_to_stack(stack_t* );
 
 struct stack*       make_std_stack();
 struct stack*       make_stack(allocator_t , deallocator_t );
