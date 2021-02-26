@@ -10,6 +10,24 @@ is_empty_avl_tree(avl_tree_t* tree)
 }
 
 
+
+inline
+height_t                
+get_height_avl_tree(avl_tree_t* tree)
+{
+    return get_height_node_r(tree->root);
+}
+
+
+inline
+balance_t           
+balance_check_to_avl_tree(avl_tree_t* tree)
+{
+    return balance_check_to_node(tree->root);
+}
+
+
+
 inline
 avl_tree_iterator_t*    
 get_min_to_avl_tree(avl_tree_t* tree)
@@ -38,6 +56,7 @@ find_to_avl_tree(avl_tree_t* tree, avl_tree_value_t val)
 {
     if (!is_empty_avl_tree(tree))
         return find_node_to_avl_tree(tree, tree->root, val);
+
     return NULL;
 }
 
@@ -68,11 +87,11 @@ remove_to_avl_tree(avl_tree_t* tree, avl_tree_iterator_t* val)
 }
 
 
-
+inline
 void                    
 for_each_avl_tree(avl_tree_t* tree, tree_func_t do_something,void** data)
 {
-
+    for_each_node_to_avl_tree(tree, &(tree->root), do_something, data);
 }
 
 

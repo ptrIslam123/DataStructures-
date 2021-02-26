@@ -1,6 +1,112 @@
 #include "heder/private_avl_tree_ip.h"
 
 
+
+
+void                    
+fix_tree_balance(tree_node_t* root)
+{
+
+}
+
+
+height_t                
+get_height_node(tree_node_t* node)
+{
+    height_t lh = node->left_node->height;
+    height_t rh = node->right_node->height;
+    return (lh > rh ? lh : rh) + 1;
+}
+
+/* рекурсивный метод вычисления глубины дерева */
+height_t                
+get_height_node_r(tree_node_t* node)
+{
+    if (node == NULL)
+        return 0;
+
+    height_t left_h = get_height_node_r(node->left_node);
+    height_t rigth_h = get_height_node_r(node->right_node);
+
+    return (left_h > rigth_h ? left_h : rigth_h) + 1;
+}   
+
+
+inline
+balance_t           
+balance_check_to_node(tree_node_t* root)
+{
+    return get_height_node_r(root->left_node) - get_height_node_r(root->right_node);
+}
+
+
+
+
+void                    
+smal_left_rotation(tree_node_t* root)
+{
+    tree_node_t* right      = root->right_node;
+    tree_node_t* sub_tree   = right->left_node;
+
+    right->left_node = root;
+    root->right_node = sub_tree;
+}
+
+
+void                    
+smal_right_rotation(tree_node_t* root)
+{
+    tree_node_t* left       = root->left_node;
+    tree_node_t* sub_tree   = left->right_node;
+
+    left->right_node = root;
+    root->right_node = sub_tree;
+}
+
+
+inline
+void                    
+big_left_rotation(tree_node_t* root)
+{
+    smal_right_rotation(root->right_node);
+    smal_left_rotation(root);
+}
+
+
+inline
+void                    
+big_right_rotation(tree_node_t* root)
+{
+    smal_left_rotation(root->left_node);
+    smal_right_rotation(root);
+}
+
+
+
+void                    
+for_each_node_to_avl_tree(
+    tree_t*         tree, 
+    tree_node_t**   root, 
+    tree_func_t     do_something, 
+    void**          data
+)
+{
+    tree_node_t* node = *root;
+
+    if (node == NULL)
+        return;
+    
+    for_each_node_to_avl_tree(tree, &(node->left_node), 
+                        do_something, data);
+    
+    do_something(tree, &node, data);
+
+    for_each_node_to_avl_tree(tree, &(node->right_node), 
+                        do_something, data);
+}
+
+
+
 tree_iterator_t*        
 find_node_to_avl_tree(tree_t* tree, tree_node_t* root, tree_value_t val)
 {
@@ -27,6 +133,7 @@ find_max_node_to_avl_tree(tree_node_t* root)
     return root;
 }
 
+
 tree_iterator_t*        
 find_min_node_to_avl_tree(tree_node_t* root)
 {
@@ -35,6 +142,7 @@ find_min_node_to_avl_tree(tree_node_t* root)
 
     return root;
 }
+
 
 
 void                    
@@ -67,7 +175,11 @@ insert_node_to_avl_tree(tree_t* tree, tree_node_t** root, tree_node_t** new_node
             tmp_node->parent        = tmp_root;
         } 
     }
+
+    fix_tree_balance(tmp_root);
 }
+
+
 
 struct avl_tree_node*   
 make_avl_tree_node(allocator_t allocate, avl_tree_value_t data)

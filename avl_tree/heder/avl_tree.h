@@ -13,13 +13,15 @@ struct avl_tree;
 struct avl_tree_node;
 
 
-typedef void* avl_tree_value_t;
-typedef struct avl_tree_node avl_tree_iterator_t;
-typedef void* (*allocator_t)(size_t );
-typedef void (*deallocator_t)(void* );
+typedef void*   avl_tree_value_t;
+typedef struct  avl_tree_node avl_tree_iterator_t;
+typedef void*   (*allocator_t)(size_t );
+typedef void    (*deallocator_t)(void* );
 typedef unsigned char (*compare_t)(const avl_tree_value_t , const avl_tree_value_t );
 
 typedef void (*tree_func_t)(struct avl_tree* , avl_tree_iterator_t** , void** );
+typedef size_t  height_t;
+typedef short   balance_t;
 
 
 typedef struct avl_tree
@@ -41,7 +43,7 @@ typedef struct avl_tree_node
     struct avl_tree_node*   left_node;
     struct avl_tree_node*   right_node;
     struct avl_tree_node*   parent;
-    size_t                  height;
+    height_t                height;
     avl_tree_value_t        data;
 
 } avl_tree_node_t;
@@ -54,6 +56,11 @@ typedef struct avl_tree_node
 
 
 unsigned char           is_empty_avl_tree(avl_tree_t* );
+
+
+height_t                get_height_avl_tree(avl_tree_t* );
+balance_t               balance_check_to_avl_tree(avl_tree_t* );
+
 
 avl_tree_iterator_t*    get_min_to_avl_tree(avl_tree_t* );
 avl_tree_iterator_t*    get_max_to_avl_tree(avl_tree_t* );
