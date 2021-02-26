@@ -59,7 +59,7 @@ insert_to_tree(tree_t* tree, tree_value_t data)
 
 
 void                
-remove_by_ptr_to_tree(tree_t* tree, tree_iterator_t* root)
+remove_to_tree(tree_t* tree, tree_iterator_t* root)
 {
     tree_node_t* target = root;
     tree_node_t* parent = target->parent;
@@ -68,7 +68,7 @@ remove_by_ptr_to_tree(tree_t* tree, tree_iterator_t* root)
     {
         tree_node_t* local_max_node = find_max_node_to_tree(target->left_node);
         target->data = local_max_node->data;
-        remove_by_ptr_to_tree(tree, local_max_node);
+        remove_to_tree(tree, local_max_node);
         return;
     }
     else if (target->left_node != NULL && target->right_node == NULL)
@@ -160,7 +160,7 @@ make_tree(allocator_t allocate, deallocator_t deallocate,
 
 
 void            
-free_tree_struct(tree_t* tree)
+free_tree(tree_t* tree)
 {
     //for_each_node_to_tree(tree, tree->root, clear_node_to_tree ,NULL);
 
