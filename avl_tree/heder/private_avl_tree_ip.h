@@ -14,7 +14,6 @@ typedef avl_tree_value_t        tree_value_t;
 void                    fix_tree_balance(tree_node_t* );
 
 height_t                get_height_node(tree_node_t* );
-height_t                get_height_node_r(tree_node_t* );
 
 balance_t               balance_check_to_node(tree_node_t* );
 
@@ -37,6 +36,7 @@ void                    insert_node_to_avl_tree(tree_t* , tree_node_t** , tree_n
 
 struct avl_tree_node*   make_avl_tree_node(allocator_t , avl_tree_value_t );
 
+void                    free_avl_node(deallocator_t , tree_node_t* );
 
 
 #endif // !_PRIVATE_AVL_TREE_STRUCT_H_

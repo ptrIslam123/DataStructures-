@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include "heder/private_avl_tree_ip.h"
 
 
@@ -6,37 +7,50 @@
 void                    
 fix_tree_balance(tree_node_t* root)
 {
+    height_t left_balance = get_height_node(root->right_node) 
+                                - get_height_node(root->left_node);
 
+    height_t right_balance = get_height_node(root->left_node)
+                                - get_height_node(root->right_node);
+
+
+    printf("root->data = %d\n", *(GET_ATK(int, root)));
+    //printf("left_balance = %d\nright_balance = %d\n\n", left_balance, right_balance);
+
+    if (left_balance == 2)
+    {
+        
+    }
+    else if (right_balance == 2)
+    {
+
+    }
+    else
+    {
+        // nothing
+    }
 }
 
 
 height_t                
 get_height_node(tree_node_t* node)
 {
-    height_t lh = node->left_node->height;
-    height_t rh = node->right_node->height;
-    return (lh > rh ? lh : rh) + 1;
-}
-
-/* рекурсивный метод вычисления глубины дерева */
-height_t                
-get_height_node_r(tree_node_t* node)
-{
-    if (node == NULL)
+     if (node == NULL)
         return 0;
 
-    height_t left_h = get_height_node_r(node->left_node);
-    height_t rigth_h = get_height_node_r(node->right_node);
+    height_t left_h = get_height_node(node->left_node);
+    height_t rigth_h = get_height_node(node->right_node);
 
     return (left_h > rigth_h ? left_h : rigth_h) + 1;
-}   
+}
+  
 
 
 inline
 balance_t           
 balance_check_to_node(tree_node_t* root)
 {
-    return get_height_node_r(root->left_node) - get_height_node_r(root->right_node);
+    return get_height_node(root->left_node) - get_height_node(root->right_node);
 }
 
 
@@ -176,7 +190,7 @@ insert_node_to_avl_tree(tree_t* tree, tree_node_t** root, tree_node_t** new_node
         } 
     }
 
-    fix_tree_balance(tmp_root);
+    fix_tree_balance(tmp_node);
 }
 
 
@@ -193,4 +207,13 @@ make_avl_tree_node(allocator_t allocate, avl_tree_value_t data)
     new_node->height        = 0;
 
     return new_node;
+}
+
+
+
+void                    
+free_avl_node(deallocator_t deallocate, tree_node_t* node)
+{
+    deallocate(node);
+    node = NULL;
 }
