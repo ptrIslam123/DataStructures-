@@ -17,6 +17,10 @@ compil:
 	make compil_list
 	make compil_clib
 
+
+compil_test:
+	$(CC) -g -c ../test/*.c
+
 link:
 	$(CC) *.o -o $(RESULT)
 

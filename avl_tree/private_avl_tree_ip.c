@@ -3,97 +3,36 @@
 
 
 
-
-void                    
-fix_tree_balance(tree_node_t* root)
-{
-    height_t left_balance = get_height_node(root->right_node) 
-                                - get_height_node(root->left_node);
-
-    height_t right_balance = get_height_node(root->left_node)
-                                - get_height_node(root->right_node);
-
-
-    printf("root->data = %d\n", *(GET_ATK(int, root)));
-    //printf("left_balance = %d\nright_balance = %d\n\n", left_balance, right_balance);
-
-    if (left_balance == 2)
-    {
-        
-    }
-    else if (right_balance == 2)
-    {
-
-    }
-    else
-    {
-        // nothing
-    }
-}
-
-
+inline
 height_t                
 get_height_node(tree_node_t* node)
 {
      if (node == NULL)
         return 0;
-
-    height_t left_h = get_height_node(node->left_node);
-    height_t rigth_h = get_height_node(node->right_node);
-
-    return (left_h > rigth_h ? left_h : rigth_h) + 1;
+    return node->height;
 }
   
+
+
+
+void                
+eval_height(tree_node_t* node)
+{
+    height_t left_h = get_height_node(node->left_node);
+    height_t right_h= get_height_node(node->right_node);
+
+    node->height = (left_h > right_h ? left_h : right_h) + 1;
+}
 
 
 inline
 balance_t           
 balance_check_to_node(tree_node_t* root)
 {
-    return get_height_node(root->left_node) - get_height_node(root->right_node);
+    return get_height_node(root->right_node) 
+            - get_height_node(root->left_node);
 }
 
-
-
-
-void                    
-smal_left_rotation(tree_node_t* root)
-{
-    tree_node_t* right      = root->right_node;
-    tree_node_t* sub_tree   = right->left_node;
-
-    right->left_node = root;
-    root->right_node = sub_tree;
-}
-
-
-void                    
-smal_right_rotation(tree_node_t* root)
-{
-    tree_node_t* left       = root->left_node;
-    tree_node_t* sub_tree   = left->right_node;
-
-    left->right_node = root;
-    root->right_node = sub_tree;
-}
-
-
-inline
-void                    
-big_left_rotation(tree_node_t* root)
-{
-    smal_right_rotation(root->right_node);
-    smal_left_rotation(root);
-}
-
-
-inline
-void                    
-big_right_rotation(tree_node_t* root)
-{
-    smal_left_rotation(root->left_node);
-    smal_right_rotation(root);
-}
 
 
 
@@ -159,40 +98,127 @@ find_min_node_to_avl_tree(tree_node_t* root)
 
 
 
-void                    
-insert_node_to_avl_tree(tree_t* tree, tree_node_t** root, tree_node_t** new_node)
+
+tree_node_t*                    
+smal_left_rotation(tree_node_t* y)
 {
-    tree_node_t* tmp_root = *root;
+    tree_node_t* x  = y->right_node;
+    y->right_node   = x->left_node;
+    x->left_node    = y;
+
+    eval_height(y);
+    eval_height(x);
+
+    return x;
+}
+
+
+tree_node_t*                    
+smal_right_rotation(tree_node_t* x)
+{
+    tree_node_t* y  = x->left_node;
+    x->left_node    = y->right_node;
+    y->right_node   = x;
+
+    eval_height(x);
+    eval_height(y);
+
+    return y;
+}
+
+
+inline
+tree_node_t*                    
+big_left_rotation(tree_node_t* root)
+{
+    root->right_node = smal_right_rotation(root->right_node);
+    return smal_left_rotation(root);
+}
+
+
+inline
+tree_node_t*                    
+big_right_rotation(tree_node_t* root)
+{
+    root->left_node = smal_left_rotation(root->left_node);
+    return smal_right_rotation(root);
+}
+
+
+
+
+tree_node_t*                    
+fix_tree_balance(tree_node_t* root)
+{
+
+    if (balance_check_to_node(root) == 2)
+    {
+        if (balance_check_to_node(root->right_node) < 0)
+            root->right_node = smal_right_rotation(root->right_node);
+        
+        return smal_left_rotation(root);
+    }
+
+    if (balance_check_to_node(root) == -2)
+    {
+        if (balance_check_to_node(root->left_node) > 0)
+            root->left_node = smal_left_rotation(root->left_node);
+        return smal_right_rotation(root);
+    }
+
+    return root;
+}
+
+
+
+tree_node_t*                    
+insert_node_to_avl_tree(
+    tree_t* tree, 
+    tree_node_t** root, 
+    tree_node_t** new_node
+)
+{
+    tree_node_t* tmp_root =*root;
     tree_node_t* tmp_node = *new_node;
+
+    if (tmp_root == NULL)
+    {
+        return tmp_node;
+    }
 
     if (tree->is_more(tmp_root->data, tmp_node->data))
     {
-        if (tmp_root->left_node != NULL)
-        {
-            insert_node_to_avl_tree(tree, &(tmp_root->left_node), &tmp_node);
-        }
-        else
-        {
-            tmp_root->left_node     = tmp_node;
-            tmp_node->parent        = tmp_root;
-        }
+        tmp_root->left_node = insert_node_to_avl_tree(
+            tree, 
+            &(tmp_root->left_node), 
+            &tmp_node
+        );
     }
     else
     {
-        if (tmp_root->right_node != NULL)
-        {
-            insert_node_to_avl_tree(tree, &(tmp_root->right_node), &tmp_node);
-        }
-        else
-        {
-            tmp_root->right_node    = tmp_node;
-            tmp_node->parent        = tmp_root;
-        } 
+        tmp_root->right_node = insert_node_to_avl_tree(
+            tree,
+            &(tmp_root->right_node), 
+            &tmp_node
+        );
     }
+    
+    eval_height(tmp_root);
 
-    fix_tree_balance(tmp_node);
+    return fix_tree_balance(tmp_root);
 }
 
+
+
+tree_node_t*            
+remove_node_to_avl_tree(
+    tree_t* tree, 
+    tree_node_t* root, 
+    tree_iterator_t* itr
+)
+{
+    return NULL;
+}
 
 
 struct avl_tree_node*   
@@ -204,7 +230,7 @@ make_avl_tree_node(allocator_t allocate, avl_tree_value_t data)
     new_node->left_node     = NULL;
     new_node->right_node    = NULL;
     new_node->parent        = NULL;
-    new_node->height        = 0;
+    new_node->height        = 1;
 
     return new_node;
 }
