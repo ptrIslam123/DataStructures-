@@ -237,6 +237,32 @@ make_avl_tree_node(allocator_t allocate, avl_tree_value_t data)
 
 
 
+
+
+void                    
+free_tree(tree_t* tree, tree_node_t* root)
+{
+    tree_node_t* left = root->left_node;
+    tree_node_t* right = root->right_node;
+
+    if (left != NULL && right != NULL)
+    {
+        free_tree(tree, root->left_node);
+        free_tree(tree, root->right_node);
+    }
+    else if (left != NULL && right == NULL)
+    {
+        free_tree(tree, root->left_node);
+    }
+    else if (left == NULL && right != NULL)
+    {
+        free_tree(tree, root->right_node);
+    }
+    
+    tree->deallocate(root);
+    tree->size_tree--;
+}
+
 void                    
 free_avl_node(deallocator_t deallocate, tree_node_t* node)
 {

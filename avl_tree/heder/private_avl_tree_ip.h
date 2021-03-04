@@ -57,6 +57,8 @@ tree_node_t*            remove_node_to_avl_tree(
 
 struct avl_tree_node*   make_avl_tree_node(allocator_t , avl_tree_value_t );
 
+
+void                    free_tree(tree_t* , tree_node_t* );
 void                    free_avl_node(deallocator_t , tree_node_t* );
 
 

@@ -136,7 +136,12 @@ make_avl_tree(allocator_t allocate, deallocator_t deallocate,
 void                    
 free_avl_tree(avl_tree_t* tree)
 {
+    if (is_empty_avl_tree(tree))
+        return;
 
+    free_tree(tree, tree->root);
+    free(tree);
+    tree = NULL;
 }
 
 
