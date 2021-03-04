@@ -28,17 +28,27 @@ int main()
         insert_to_avl_tree(tree, v);
     }
     
+    printf("print tree values\n");
     for_each_avl_tree(tree, print_t, NULL);
+    printf("\n\n");
 
     test_tree(tree, tree->root);
     test_balance_tree(tree);
 
-    printf("size tree = %d\n", tree->size_tree);
+    int* v = make_int(3);
+    printf("search value = %d\n", *v);
+    avl_tree_iterator_t* i = find_to_avl_tree(tree, v);
+    printf("find node->key = %d\n", *(GET_ATK(int, i)));
+
+    remove_by_ptr_to_avl_tree(tree, i);
+    printf("remove by pointer->key = %d\n\n", *v);
+
+
+    printf("print tree values\n");
+    for_each_avl_tree(tree, print_t, NULL);
+    printf("\n\n");
 
     free_avl_tree(tree);
-
-    //printf("size avl tree after free tree = %d\n", tree->size_tree);
-    
 
     return 0;
 }

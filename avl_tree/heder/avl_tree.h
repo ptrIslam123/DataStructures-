@@ -64,26 +64,62 @@ balance_t               balance_check_to_avl_tree(avl_tree_t* );
 
 avl_tree_iterator_t*    get_min_to_avl_tree(avl_tree_t* );
 avl_tree_iterator_t*    get_max_to_avl_tree(avl_tree_t* );
-avl_tree_iterator_t*    find_to_avl_tree(avl_tree_t* , avl_tree_value_t );
-void                    insert_to_avl_tree(avl_tree_t* , avl_tree_value_t );
+avl_tree_iterator_t*    find_to_avl_tree(
+                            avl_tree_t* , 
+                            avl_tree_value_t 
+);
+void                    insert_to_avl_tree(
+                            avl_tree_t* , 
+                            avl_tree_value_t 
+);
 
-void                    remove_to_avl_tree(avl_tree_t* , avl_tree_iterator_t* );
+void                    remove_to_avl_tree(
+                            avl_tree_t* , 
+                            avl_tree_value_t 
+);
 
 
-void                    for_each_avl_tree(avl_tree_t* , tree_func_t ,void** );
+void                    remove_by_ptr_to_avl_tree(
+                            avl_tree_t* ,
+                            avl_tree_iterator_t* 
+);
 
-struct avl_tree*         make_std_avl_tree(compare_t is_eq, compare_t is_lt, compare_t is_gt);
-struct avl_tree*         make_avl_tree(allocator_t, deallocator_t , 
-                            compare_t is_eq, compare_t is_lt, compare_t is_gt);
+void                    for_each_avl_tree(
+                            avl_tree_t* , 
+                            tree_func_t ,
+                            void** 
+);
+
+struct avl_tree*         make_std_avl_tree(
+                            compare_t is_eq, 
+                            compare_t is_lt, 
+                            compare_t is_gt
+);
+struct avl_tree*         make_avl_tree(
+                            allocator_t, 
+                            deallocator_t , 
+                            compare_t is_eq, 
+                            compare_t is_lt, 
+                            compare_t is_gt
+);
 
 void                    free_avl_tree(avl_tree_t* );
 
 
 
 
-unsigned char           is_eqi_avl(const avl_tree_value_t root, const avl_tree_value_t other);
-unsigned char           is_lessi_avl(const  avl_tree_value_t root, const avl_tree_value_t other);
-unsigned char           is_morei_avl(const avl_tree_value_t root, const avl_tree_value_t other);
+unsigned char           is_eqi_avl(
+                            const avl_tree_value_t root, 
+                            const avl_tree_value_t other
+);
+unsigned char           is_lessi_avl(
+                            const  avl_tree_value_t root, 
+                            const avl_tree_value_t other
+);
+unsigned char           is_morei_avl(
+                            const avl_tree_value_t root, 
+                            const avl_tree_value_t other
+);
 
 
 

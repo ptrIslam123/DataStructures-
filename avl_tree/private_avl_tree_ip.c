@@ -214,10 +214,86 @@ tree_node_t*
 remove_node_to_avl_tree(
     tree_t* tree, 
     tree_node_t* root, 
+    tree_value_t val
+)
+{
+    if (root == NULL)
+        return NULL;
+
+    if (tree->is_less(val, root->data))
+        root->left_node = remove_node_to_avl_tree(tree, root->left_node, val);
+
+    else if(tree->is_more(val, root->data))
+        root->right_node = remove_node_to_avl_tree(tree, root->right_node, val);
+    
+    else
+    {
+        tree_node_t* left = root->left_node;
+        tree_node_t* right = root->right_node;
+
+        free_avl_node(tree->deallocate, root);
+
+        if (right == NULL)
+            return left;
+
+        tree_node_t* local_min = find_min_node_to_avl_tree(right);
+
+        local_min->right_node = remove_min_node_to_avl_tree(right);
+        local_min->left_node = left;
+        return fix_tree_balance(local_min);
+    }
+    
+    return fix_tree_balance(root);
+}
+
+
+
+
+tree_node_t*            
+remove_node_by_ptr_to_avl_tree(
+    tree_t* tree,
+    tree_node_t* root,
     tree_iterator_t* itr
 )
 {
-    return NULL;
+    if (root == NULL)
+        return NULL;
+
+    if (tree->is_less(itr->data, root->data))
+        root->left_node = remove_node_by_ptr_to_avl_tree(tree, root->left_node, itr);
+
+    else if(tree->is_more(itr->data, root->data))
+        root->right_node = remove_node_by_ptr_to_avl_tree(tree, root->right_node, itr);
+    
+    else
+    {
+        tree_node_t* left = root->left_node;
+        tree_node_t* right = root->right_node;
+
+        free_avl_node(tree->deallocate, root);
+
+        if (right == NULL)
+            return left;
+
+        tree_node_t* local_min = find_min_node_to_avl_tree(right);
+
+        local_min->right_node = remove_min_node_to_avl_tree(right);
+        local_min->left_node = left;
+        return fix_tree_balance(local_min);
+    }
+    
+    return fix_tree_balance(root);
+}
+
+
+tree_node_t*            
+remove_min_node_to_avl_tree(tree_node_t* root)
+{
+    if (root->left_node == NULL)
+        return root->right_node;
+
+    root->left_node = remove_min_node_to_avl_tree(root->left_node);
+    return fix_tree_balance(root);
 }
 
 
@@ -263,6 +339,8 @@ free_tree(tree_t* tree, tree_node_t* root)
     tree->size_tree--;
 }
 
+
+inline
 void                    
 free_avl_node(deallocator_t deallocate, tree_node_t* node)
 {

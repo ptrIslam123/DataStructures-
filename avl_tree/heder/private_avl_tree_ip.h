@@ -50,9 +50,16 @@ tree_node_t*            insert_node_to_avl_tree(
 tree_node_t*            remove_node_to_avl_tree(
                             tree_t* , 
                             tree_node_t* , 
+                            tree_value_t
+);
+
+tree_node_t*            remove_node_by_ptr_to_avl_tree(
+                            tree_t* ,
+                            tree_node_t* ,
                             tree_iterator_t*
 );
 
+tree_node_t*            remove_min_node_to_avl_tree(tree_node_t* );
 
 
 struct avl_tree_node*   make_avl_tree_node(allocator_t , avl_tree_value_t );

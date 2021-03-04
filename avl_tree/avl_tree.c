@@ -78,14 +78,30 @@ insert_to_avl_tree(avl_tree_t* tree, avl_tree_value_t val)
 
 
 void                    
-remove_to_avl_tree(avl_tree_t* tree, avl_tree_iterator_t* node)
+remove_to_avl_tree(avl_tree_t* tree, avl_tree_value_t val)
 {
     if (is_empty_avl_tree(tree))
         return;
         
-    tree->root = remove_node_to_avl_tree(tree, tree->root, node);
+    tree->root = remove_node_to_avl_tree(tree, tree->root, val);
     tree->size_tree--;
 }
+
+
+
+void                    
+remove_by_ptr_to_avl_tree(
+    avl_tree_t* tree,
+    avl_tree_iterator_t* itr 
+)
+{
+    if (is_empty_avl_tree(tree))
+        return;
+
+    tree->root = remove_node_by_ptr_to_avl_tree(tree, tree->root, itr);
+    tree->size_tree--;
+}
+
 
 
 inline
