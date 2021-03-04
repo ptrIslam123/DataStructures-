@@ -3,26 +3,70 @@
 
 #include <stdlib.h>
 
+
+
 struct set;
-typedef struct set set_t;
+typedef struct set          set_t;
 typedef void* (*allocator_t)(size_t );
 typedef void (*deallocator_t)(void* );
-typedef void* set_value_t;
+typedef void*               set_value_t;
+typedef unsigned char (*set_compare_t)(const set_value_t , const set_value_t );
+
 
 #define SIZE_SET_STRCUT   (sizeof(struct set))
 #define GET_SETV(T,V)         ((T*)V)
 
 
-unsigned char       is_empty_set(set_t* );
+unsigned char           is_empty_set(set_t* );
+/* проверяет принадлежит ли элемент данному множеству */
+unsigned char           in_here(set_t* , set_value_t );
+size_t                  set_size(set_t* );
+/* операция проверки на то 
+ялвяется ли одно множество подмножеством другого множества */
+unsigned char           is_sub_set(set_t* , set_t* );
+/* операция для проверку  пересекаемости двух множеств*/
+set_t*                  intersection_for_set(set_t* , set_t* );
+/* операция обьединения двух множеств */
+set_t*                  union_for_set(set_t* , set_t* );
+/* операция разности для множеств */
+set_t*                  difference_for_set(set_t* , set_t* );
 
-void                swap_set(set_t* , set_t* );
+void                    push_to_set(set_t* , set_value_t );
+set_value_t*            pop_from_set(set_t* , size_t );
+void                    remove_from_set(set_t* , size_t );
 
-void                push_to_set(set_t* , set_value_t );
-set_value_t         pop_from_set(set_t* , size_t );
+void                    for_each_set(set_t* , void** );
 
-struct set*         make_std_set();
-struct set*         make_set(allocator_t , deallocator_t );
 
-void                free_set(struct set* );
+struct set*             make_std_set(
+                            set_compare_t is_eq,
+                            set_compare_t is_less,
+                            set_compare_t is_more
+);
+
+struct set*             make_set(
+                            set_compare_t is_eq,
+                            set_compare_t is_less,
+                            set_compare_t is_more,
+                            allocator_t , 
+                            deallocator_t 
+);
+
+void                    free_set(struct set* );
+
+
+
+unsigned char           is_eqi_set(
+                            const set_value_t root, 
+                            const set_value_t other
+);
+unsigned char           is_lessi_set(
+                            const set_value_t root, 
+                            const set_value_t other
+);
+unsigned char           is_morei_set(
+                            const set_value_t root, 
+                            const set_value_t other
+);
 
 #endif // !_SET_STRUCT_H_

@@ -1,13 +1,13 @@
 CC=gcc
 RESULT=set
-PATH_LIST=../../avl_tree
+PATH_LIST=../../list
 PATH_CLIB=../../clib
 
 main.o:
 	$(CC) -g ../main.c
 
 compil_list:
-	$(CC) -g -c $(PATH_LIST)/avl_tree.c $(PATH_LIST)/private_avl_tree_ip.c
+	$(CC) -g -c $(PATH_LIST)/list.c $(PATH_LIST)/private_list_ip.c
 
 compil_clib:
 	$(CC) -g -c $(PATH_CLIB)/clib.c
