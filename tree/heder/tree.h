@@ -60,7 +60,7 @@ tree_iterator_t*    get_max_to_tree(tree_t* );
 tree_iterator_t*    find_to_tree(tree_t* , tree_value_t );
 void                insert_to_tree(tree_t* , tree_value_t );
 
-void                remove_by_ptr_to_tree(tree_t* , tree_iterator_t* );
+void                remove_to_tree(tree_t* , tree_iterator_t* );
 
 
 void                for_each_tree(tree_t* , tree_func_t ,void** );
@@ -69,7 +69,7 @@ struct tree*        make_std_tree(compare_t is_eq, compare_t is_lt, compare_t is
 struct tree*        make_tree(allocator_t, deallocator_t , 
                         compare_t is_eq, compare_t is_lt, compare_t is_gt);
 
-void                free_tree_struct(tree_t* );
+void                free_tree(tree_t* );
 
 
 
