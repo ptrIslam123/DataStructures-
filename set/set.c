@@ -1,8 +1,23 @@
 #include "heder/set.h"
 #include "heder/private_set_ip.h"
+#include <stdio.h>
 
 
+set_t*                    
+init_set(set_t* set, struct init_list* init)
+{
+    const size_t size       = init->size_data;
+    const size_t size_type  = init->size_dataa_type;
+    init_list_value_t data  = init->data;
 
+    for (int i = 0; i < size; ++i)
+    {
+        push_to_set(set, data);
+        data += size_type;
+    }
+
+    return set;
+}
 
 inline
 unsigned char       
@@ -31,39 +46,107 @@ set_size(set_t* set)
 }
 
 
-/* операция проверки на то 
-ялвяется ли одно множество подмножеством другого множества */
+/* 
+    операция проверки на то 
+    ялвяется ли одно множество подмножеством другого множества 
+    A c B = {x | x з B}, где э - знак принадлежит
+*/
 unsigned char       
-is_sub_set(set_t* sl, set_t* sr)
+is_sub_set(set_t* sA, set_t* sB)
 {
-    return 0;
+    list_t* A = sA->container;
+
+    for (
+        list_iterator_t* a = begin_list(A);
+        a != end_list(A);
+        incr_list_itr(&a)
+    )
+    {
+        if (!in_here(sB, a->key))
+            return 0;
+    }
+    return 1;
 }
 
 
 
-/* операция для проверку  пересекаемости двух множеств*/
+/* 
+    операция для проверку  пересекаемости двух множеств
+    A ^ B = {x | x э A && x э B}
+*/
 set_t*              
-intersection_for_set(set_t* sl, set_t* sr)
+intersection_set(set_t* sA, set_t* sB, set_t* new_set)
 {
-    return NULL;
+    list_t* C = max_set(sA, sB);
+
+    for (
+        list_iterator_t* c = begin_list(C);
+        c != end_list(C);
+        incr_list_itr(&c)
+    )
+    {
+        if (in_here(sA, c->key) && in_here(sB, c->key))
+            push_to_set(new_set, c->key);
+    }
+    return new_set;
 }
 
 
 
-/* операция обьединения двух множеств */
+/* 
+    операция обьединения двух множеств 
+    A u B = {x | x э A || x э B}
+*/
 set_t*              
-union_for_set(set_t* sl, set_t* sr)
+union_set(set_t* sA, set_t* sB, set_t* new_set)
 {
-    return NULL;
+    list_t* A = sA->container;
+    list_t* B = sB->container;
+
+    for (
+        list_iterator_t* a = begin_list(A);
+        a != end_list(A);
+        incr_list_itr(&a)
+    )
+    {
+        push_to_set(new_set, a->key);
+    }
+
+
+    for (
+        list_iterator_t* b = begin_list(B);
+        b != end_list(B);
+        incr_list_itr(&b)
+    )
+    {
+        push_to_set(new_set, b->key);
+    }
+
+    return new_set;
 }
 
 
 
-/* операция разности для множеств */
+/* 
+    операция разности для множеств 
+    A \ B = {x | x э A && x ^э B}, где ^э - не принадлежит
+*/
 set_t*              
-difference_for_set(set_t* sl, set_t* sr)
+difference_set(set_t* sA, set_t* sB, set_t* new_set)
 {
-    return NULL;
+    list_t* C = max_set(sA, sB);
+
+    for (
+        list_iterator_t* c = begin_list(C);
+        c != end_list(C);
+        incr_list_itr(&c)
+    )
+    {
+        if (in_here(sA, c->key) && !in_here(sB, c->key))
+            push_to_set(new_set, c->key);
+    }
+
+    return new_set;
 }
 
 

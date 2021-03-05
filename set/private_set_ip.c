@@ -21,6 +21,19 @@ find_item_to_list(set_t* set, set_value_t val)
 
 
 
+
+list_t*                 
+max_set(set_t* sl, set_t* sr)
+{
+    list_t* ll = sl->container;
+    list_t* lr = sr->container;
+
+    if (ll->size_list > lr->size_list)
+        return ll;
+    return lr;
+}
+
+
 inline
 void                    
 out_of_range(size_t indx)
