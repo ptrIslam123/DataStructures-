@@ -1,7 +1,7 @@
 CC=gcc
 RESULT=free_list_allocator
-PATH_LIST=../../list
-PATH_CLIB=../../clib
+PATH_LIST=../../../list
+PATH_CLIB=../../../clib
 
 main.o:
 	$(CC) -g ../main.c
