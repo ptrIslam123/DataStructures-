@@ -31,7 +31,7 @@ int main()
     printf("print tree values\n");
     for_each_avl_tree(tree, print_t, NULL);
     printf("\n\n");
-
+/
     test_tree(tree, tree->root);
     test_balance_tree(tree);
 
