@@ -1,71 +1,61 @@
 #include <stdio.h>
 #include "heder/list.h"
 #include "heder/test.h"
-
-
-#define print_list(T, L)                                    \
-            for (list_iterator_t*   i = begin_list(L);      \
-                            i != end_list(L);               \
-                            incr_list_itr(&i))              \
-            {                                               \
-                printf("k = %c\n", *GET_LK(T, i));           \
-            }                                                         
+#include "../clib/heder/clib.h"
 
 
 
-
-typedef struct point
+void print_list(list_t* list)
 {
-    int x,y;
-} point_t;
-
-point_t* make_point(int _x, int _y)
-{
-    point_t* new_point = malloc(sizeof(point_t));
-
-    new_point->x = _x;
-    new_point->y = _y;
-
-    return new_point;
+    for (
+        list_iterator_t* i = begin_list(list);
+        i != end_list(list);
+        incr_list_itr(&i)
+    )
+    {
+        printf("item = %d\n", *(GET_LK(int, i)));
+    }
+    printf("\n");
 }
 
-char* make_char(char c)
+void check_sort_list(list_t* list)
 {
-    char* nc = malloc(sizeof(char));
-    *nc = c;
+    for (
+        list_iterator_t* i = list->begin->next_node;
+        i != end_list(list);
+        incr_list_itr(&i)
+    )
+    {
+        list_iterator_t* cur = i;
+        list_iterator_t* prev = i->prev_node;
 
-    return nc;
+        if (is_morei_list(prev->key, cur->key))
+        {
+            printf("%d > %d\n", *(GET_LK(int, cur)), *(GET_LK(int, prev)) 
+                );
+            exit(-1);
+        }
+    }
 }
 
 int main()
 {
-    const int size = 10;
-    list_t* listc = make_std_list();
-    list_t* listp = make_std_list();
-
-    for (int i = 0; i < size; ++i)
+    for (int i = 0; i < 100; ++i)
     {
-        point_t*    p = make_point(i, i + 10);
-        char*       c = make_char('$');
+        list_t* list = make_std_list();
 
-        push_back_to_list(listp, p);
-        push_back_to_list(listc, c);
+        for (int j = 0; j < 10; ++j)
+        {
+            push_back_to_list(list, make_int(rand() % 1000));
+        }
+
+        selection_sort_to_list(list, is_lessi_list);
+        check_sort_list(list);
+
+        free_list(list);
     }
-
-
-    for (list_iterator_t* i = rbegin_list(listp); i != rend_list(listp); rincr_list_itr(&i))
-    {
-       
-        int vx = (GET_LK(point_t, i))->x;
-
-        int vy = ((point_t*)i->key)->y;
-        printf("x = %d\t\ty = %d\n", vx, vy);
-    }
-
-
-    swap_list(listc, listp);
-
     
-
+    
     return 0;
 }
+

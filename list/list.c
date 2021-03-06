@@ -2,6 +2,38 @@
 #include "heder/private_list_ip.h"
 #include <stdio.h>
 
+
+range_list_itr_t*   
+make_range_list_itr(list_t* list, size_t beg)
+{
+    range_list_itr_t* itr = list->allocate(sizeof(range_list_itr_t));
+    itr->list           = list;
+    itr->cur_list_node  = begin_list(list);
+    itr->counter        = 0;
+    
+    advance_list(&(itr->cur_list_node), beg);
+
+    return itr;
+}
+
+
+
+list_t*             
+init_list(list_t* list, init_list_t* init)
+{
+    const size_t size       = init->size_data;
+    const size_t size_type  = init->size_dataa_type;
+    init_list_value_t data  = init->data;
+
+    for (int i = 0; i < size; ++i)
+    {
+        push_back_to_list(list, data);
+        data += size_type;
+    }
+
+    return list;
+}
+
 void            
 swap_list(list_t* first, list_t* second)
 {
@@ -12,6 +44,103 @@ swap_list(list_t* first, list_t* second)
 
 
 
+
+void                
+swap_element_list(list_iterator_t** left, list_iterator_t** right)
+{
+    void* tmp = (*left)->key;
+    (*left)->key = (*right)->key;
+    (*right)->key = tmp;
+}
+
+
+void                
+selection_sort_to_list(list_t* list, list_compare_t is_less)
+{
+    list_iterator_t* min = NULL;
+
+    for (
+        list_iterator_t* i = begin_list(list);
+        i != end_list(list);
+        incr_list_itr(&i)
+    )
+    {
+        min = min_to_list(is_less, i, end_list(list));
+        swap_element_list(&min, &i);
+    }
+}
+
+
+
+list_iterator_t*    
+min_to_list(list_compare_t is_less, list_iterator_t* beg, list_iterator_t* end)
+{
+    list_iterator_t* min = beg;
+    incr_list_itr(&beg);
+
+    for (
+        list_iterator_t* i = beg;
+        i != end;
+        incr_list_itr(&i)
+    )
+        if (is_less(i->key, min->key))
+            min = i;
+            
+    return min;
+}
+
+
+
+list_iterator_t*    
+max_to_list(list_compare_t is_more, list_iterator_t* beg, list_iterator_t* end)
+{
+    list_iterator_t* max = beg;
+    incr_list_itr(&beg);
+
+    for (
+        list_iterator_t* i = beg;
+        i != end;
+        incr_list_itr(&i)
+    )
+        if (is_more(i->key, max->key))
+            max = i;
+            
+    return max;
+}
+
+
+unsigned char       
+range_list(
+    range_list_itr_t** itr,
+    size_t end,
+    size_t step
+)
+{
+    if ((*itr)->counter >= end - 1)
+    {
+        (*itr)->counter = 0;
+        return 0;
+    }
+
+    advance_list(
+        &(*itr)->cur_list_node,
+        step
+    );
+    (*itr)->counter++;
+    return 1;
+}
+
+
+
+inline
+void                
+advance_list(list_iterator_t** itr, size_t n)
+{
+    for (size_t i = 0; i < n; i++)
+    {
+        incr_list_itr(itr);
+    }
+}
 
 
 inline
@@ -238,6 +367,16 @@ remove_from_list(list_t* list, list_iterator_t* itr)
 
 
 
+
+inline
+size_t          
+list_size(list_t* list)
+{
+    return list->size_list;
+}
+
+
+
 struct list*    
 make_std_list()
 {
@@ -278,4 +417,30 @@ free_list(struct list* list)
 {
     clear_list(list);
     free_list_struct(list);
+}
+
+
+
+
+
+
+
+
+unsigned char           
+is_eqi_list(const value_t root, const value_t other)
+{
+    return *(int*)root == *(int*)other;
+}
+
+
+unsigned char           
+is_lessi_list(const  value_t root, const value_t other)
+{
+    return *(int*)root < *(int*)other;
+}
+
+unsigned char           
+is_morei_list(const value_t root, const value_t other)
+{
+    return *(int*)root > *(int*)other;
 }
