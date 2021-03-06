@@ -25,6 +25,7 @@ void*               get_memory(size_t );
 mem_block_t*        find_free_block(size_t );
 void                add_mem_block_to_free_list(mem_block_t* );
 mem_block_t*        make_mem_block(size_t );
+unsigned char       is_less_mem_block(value_t , value_t );
 
 
 
@@ -70,10 +71,13 @@ get_memory(size_t size)
 {
     mem_block_t* free_block = find_free_block(size);
 
-    if (free_block == NULL)
-        free_block = make_mem_block(size);
-
-    return free_block;
+    if (free_block != NULL)
+    {
+        printf("[DEBUG_INF]reused mem_block->size = %d\n", size);
+        return free_block;
+    }
+    
+    return make_mem_block(size);
 }
 
 
@@ -108,15 +112,30 @@ find_free_block(size_t need_size_block)
 }
 
 
+/*
+    Данный метод добавляет очередной освободившийся блок памяти и 
+    добовляет его в список свободных к остальным, после чего весь 
+    список сортируется.
+*/
 void                
 add_mem_block_to_free_list(mem_block_t* free_block)
 {
     free_list_t* list = get_free_list_struct();
 
     push_back_to_list(list, free_block);
-    // sort_list(list);
+    selection_sort_to_list(list, is_less_mem_block);
 }
 
+
+
+unsigned char       
+is_less_mem_block(value_t first, value_t second)
+{
+    mem_block_t* fblock = (mem_block_t*)first;
+    mem_block_t* sblock = (mem_block_t*)second;
+
+    return (fblock->size_block < sblock->size_block);
+}
 
 /*
     Данный метод преднозначен для аллоцирования на куче 
@@ -140,4 +159,13 @@ make_mem_block(size_t size_block)
     new_blcok->status       = FREE_BLOCK;
 
     return new_blcok;
+}
+
+
+
+inline
+void    
+free_free_list_struct()
+{
+    free_list(get_free_list_struct());
 }
