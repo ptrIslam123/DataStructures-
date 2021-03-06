@@ -63,7 +63,10 @@ typedef struct range_list_itr
 list_t*             init_list(list_t* , init_list_t* );
 
 void                swap_list(list_t* , list_t* );
+void                swap_element_list(list_iterator_t** , list_iterator_t** );
 
+
+void                selection_sort_to_list(list_t* , list_compare_t is_less);
 
 list_iterator_t*    min_to_list(
                         list_compare_t is_less,

@@ -45,6 +45,33 @@ swap_list(list_t* first, list_t* second)
 
 
 
+void                
+swap_element_list(list_iterator_t** left, list_iterator_t** right)
+{
+    void* tmp = (*left)->key;
+    (*left)->key = (*right)->key;
+    (*right)->key = tmp;
+}
+
+
+void                
+selection_sort_to_list(list_t* list, list_compare_t is_less)
+{
+    list_iterator_t* min = NULL;
+
+    for (
+        list_iterator_t* i = begin_list(list);
+        i != end_list(list);
+        incr_list_itr(&i)
+    )
+    {
+        min = min_to_list(is_less, i, end_list(list));
+        swap_element_list(&min, &i);
+    }
+}
+
+
+
 list_iterator_t*    
 min_to_list(list_compare_t is_less, list_iterator_t* beg, list_iterator_t* end)
 {
