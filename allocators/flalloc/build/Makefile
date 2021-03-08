@@ -1,5 +1,5 @@
 CC=gcc
-RESULT=free_list_allocator
+RESULT=poll_allocator
 PATH_LIST=../../../list
 PATH_CLIB=../../../clib
 
