@@ -2,19 +2,17 @@
 #include "heder/private_palloc_ip.h"
 
 
+inline
 void*   
 palloc(size_t size)
 {
-    mem_block_t* mem = get_free_mem_block_to_poll_frame(size);
-    return mem + SIZE_MEM_BLOCK_STRUCT;
+    return get_mem(size);
 }
 
 
+inline
 void    
 pfree(void* pobj)
 {
-    mem_block_t* mem = pobj - SIZE_MEM_BLOCK_STRUCT;
-    mem->status_block = FREE_BLOCK;
-
-    unit_two_free_mem_block(mem);
+   set_status_to_mem(pobj, FREE_BLOCK);
 }
