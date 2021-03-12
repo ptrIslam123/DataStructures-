@@ -12,10 +12,15 @@ compil_list:
 compil_clib:
 	$(CC) -g -c $(PATH_CLIB)/clib.c
 
+
+test.o:
+	$(CC) -g -c ../test/*.c
+
 compil:
 	$(CC) -g -Wall -c ../*.c
 	make compil_list
 	make compil_clib
+
 
 link:
 	$(CC) *.o -o $(RESULT)

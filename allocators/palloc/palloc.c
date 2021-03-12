@@ -14,5 +14,6 @@ inline
 void    
 pfree(void* pobj)
 {
-   set_status_to_mem(pobj, FREE_BLOCK);
+   void* mem = get_ptr_on_mem_block_by_ptr_data(pobj);
+   set_status_mem_block(mem, FREE_BLOCK);
 }
