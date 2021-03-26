@@ -39,6 +39,8 @@ test_print_mem_block(const char* msg, mem_block_t* blcok)
 {
     printf("{\n");
     printf("\t&(%s) = %p\n", msg, blcok);
+    printf("\tprev_mem_blcok = %p\n", blcok->prev_block);
+    printf("\tnext_mem_blcok = %p\n", blcok->next_block);
     printf("\tsize_blcok = %d\n\tstatus_block = %d\n\tframe_addr = %p\n",
         blcok->size_block, blcok->status, blcok->p_frame);
     printf("}\n");

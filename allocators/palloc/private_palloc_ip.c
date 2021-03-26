@@ -3,15 +3,34 @@
 
 
 
-
 void            
-preventing_fragmentation_of_memory(mem_block_t** centr_block)
+preventing_fragmentation_of_memory(mem_block_t** block)
 {
-    mem_block_t* left_block     = get_ptr_on_prev_mem_block(*centr_block);
-    mem_block_t* right_block    = get_ptr_on_next_mem_block(*centr_block);
+    frame_t* frame = (*block)->p_frame;
+    
+    if (frame->count_blocks <= 1)
+        return;
 
-    unit_two_blocks_into_one(&left_block, centr_block);
-    unit_two_blocks_into_one(&left_block, &right_block);
+    if (is_first_mem_block_into_frame(*block))
+    {
+        mem_block_t* right_block    = (*block)->next_block;
+        
+        unit_two_blocks_into_one(block, &right_block);
+    }
+    else if (is_last_mem_block_into_frame(*block))  
+    {
+        mem_block_t* left_block     = (*block)->prev_block;
+
+        unit_two_blocks_into_one(&left_block, block);
+    }
+    else
+    {
+        mem_block_t* left_block     = (*block)->prev_block;
+        mem_block_t* right_block    = (*block)->next_block;
+
+        unit_two_blocks_into_one(&left_block, block);
+        unit_two_blocks_into_one(&left_block, &right_block);   
+    }
 }
 
 
@@ -21,8 +40,12 @@ unit_two_blocks_into_one(mem_block_t** lblock, mem_block_t** rblock)
     if (is_free_mem_blcok(*lblock) && is_free_mem_blcok(*rblock))
     {
         const size_t total_size_block = ((*lblock)->size_block + (*rblock)->size_block);
-        
+        mem_block_t* next_for_rblock = (*rblock)->next_block;
+
         (*lblock)->size_block = total_size_block;
+        (*lblock)->next_block = next_for_rblock;
+        next_for_rblock->prev_block = *lblock;
+
         ((*lblock)->p_frame)->count_blocks--;
     }
 }
@@ -110,11 +133,24 @@ make_mem_block(frame_t** frame, size_t size)
     free_block->size_block      = size;
     free_block->status          = NOT_FREE_BLOCK;
     free_block->p_frame         = *frame;
+    set_ptr_on_next_mem_block(free_block);
 
 
+    if (is_empty_frame(*frame))
+    {   
+        set_ptr_on_prev_mem_block(free_block, NULL);
+    }
+    else
+    {
+        set_ptr_on_prev_mem_block(free_block, (*frame)->prev_mem_block);
+    }
+    
+
+    (*frame)->prev_mem_block    = free_block;
+    (*frame)->end               = free_block;
     (*frame)->size_free_mem     -= size + SIZE_META_DATA;
     (*frame)->cur_free_space    += size + SIZE_META_DATA;
-    (*frame)->count_blocks++;
+    (*frame)->count_blocks++;    
 
     return free_block;
 }
@@ -129,6 +165,7 @@ make_frame(size_t size_frame)
     new_frame->begin            = malloc(size_frame);
     new_frame->end              = new_frame->begin + size_frame;
     new_frame->cur_free_space   = new_frame->begin;
+    new_frame->prev_mem_block   = NULL;
 
     new_frame->size_frame       = size_frame;
     new_frame->size_free_mem    = size_frame;
@@ -188,6 +225,26 @@ get_ptr_on_next_mem_block(mem_block_t* block)
 }
 
 
+
+inline
+void            
+set_ptr_on_prev_mem_block(mem_block_t* block,  mem_block_t* prev_block)
+{
+    (block)->prev_block = prev_block;
+}
+
+
+
+inline
+void            
+set_ptr_on_next_mem_block(mem_block_t* block)
+{
+    const size_t size_block = (block)->size_block + SIZE_META_DATA;
+    (block)->next_block = ((void*)block + size_block);
+}
+
+
+
 inline
 void*           
 get_ptr_on_data(mem_block_t* block)
@@ -243,4 +300,38 @@ status_t
 is_free_mem_blcok(mem_block_t* block)
 {
     return block->status == FREE_BLOCK;
+}
+
+
+inline
+status_t        
+is_empty_frame(frame_t* frame)
+{
+    return frame->count_blocks == 0;
+}
+
+
+
+inline
+status_t        
+is_last_mem_block_into_frame(mem_block_t* block)
+{
+    return (block->p_frame)->end == block;
+}
+
+
+
+inline
+status_t        
+is_first_mem_block_into_frame(mem_block_t* block)
+{
+    return (block->p_frame)->begin == block;
+}
+
+
+inline
+status_t        
+is_one_element_into_frame(frame_t* frame)
+{
+    return frame->count_blocks == 1;
 }

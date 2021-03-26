@@ -15,8 +15,11 @@ inline
 void    
 pfree(void* mem)
 {
-    mem_block_t* mblcok = get_ptr_on_mem_block(mem);
-    free_mem_blcok(&mblcok);
+    if (mem != NULL)
+    {
+        mem_block_t* mblcok = get_ptr_on_mem_block(mem);
+        free_mem_blcok(&mblcok);
+    }
 }
 
 

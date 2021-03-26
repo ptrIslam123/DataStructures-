@@ -16,27 +16,34 @@
 #define GET_PTR_ON_MEM_BLCOK(mem) (mem_block_t*)(mem - SIZE_META_DATA)
 
 
-typedef unsigned char status_t;
-typedef list_t        frames_t;
+typedef unsigned char     status_t;
+typedef struct mem_block  mem_block_t;
+typedef struct frame      frame_t;
+typedef list_t            frames_t;
+
 
 typedef struct frame
 {
-  void*       begin;
-  void*       end;
-  void*       cur_free_space;
+  void*               begin;
+  mem_block_t*        end;
+  void*               cur_free_space;
+  mem_block_t*        prev_mem_block;
 
-  size_t      size_frame;
-  size_t      size_free_mem;
-  size_t      count_blocks;
+  size_t              size_frame;
+  size_t              size_free_mem;
+  size_t              count_blocks;
 
 } frame_t;
 
 
 typedef struct mem_block
 {
-   size_t       size_block;
-   status_t     status;
-   frame_t*     p_frame; 
+   size_t             size_block;
+   status_t           status;
+   frame_t*           p_frame;
+
+   struct mem_block*  prev_block;
+   struct mem_block*  next_block; 
 
 } mem_block_t;
 
@@ -65,6 +72,9 @@ void            free_frames_struct(void);
 mem_block_t*    get_ptr_on_prev_mem_block(mem_block_t* block);
 mem_block_t*    get_ptr_on_next_mem_block(mem_block_t* block);
 
+void            set_ptr_on_prev_mem_block(mem_block_t* block, mem_block_t* prev_block);
+void            set_ptr_on_next_mem_block(mem_block_t* block);
+
 void*           get_ptr_on_data(mem_block_t* block);
 mem_block_t*    get_ptr_on_mem_block(void* ptr);
 
@@ -73,8 +83,10 @@ void            init_frames_struct(frames_t** frames);
 size_t          eval_size_new_frame(frames_t* frames, size_t size);
 
 status_t        is_free_mem_blcok(mem_block_t* block);
-
-
+status_t        is_empty_frame(frame_t* frame);
+status_t        is_last_mem_block_into_frame(mem_block_t* block);
+status_t        is_first_mem_block_into_frame(mem_block_t* block);
+status_t        is_one_element_into_frame(frame_t* frame);
 /*******************************************************************
  
 struct frame      |-------|-----------|-----|---------|---------|
