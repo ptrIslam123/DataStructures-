@@ -6,14 +6,23 @@ inline
 void*   
 palloc(size_t size)
 {
-    return get_mem(size);
+    mem_block_t* free_block = get_free_mem_block(size);
+    return (void*)free_block + SIZE_META_DATA;
 }
 
 
 inline
 void    
-pfree(void* pobj)
+pfree(void* mem)
 {
-   void* mem = get_ptr_on_mem_block_by_ptr_data(pobj);
-   set_status_mem_block(mem, FREE_BLOCK);
+    mem_block_t* mblcok = GET_PTR_ON_MEM_BLCOK(mem);
+   free_mem_blcok(&mblcok);
+}
+
+
+inline
+void    
+free_pallocator(void)
+{
+    free_frames_struct();
 }

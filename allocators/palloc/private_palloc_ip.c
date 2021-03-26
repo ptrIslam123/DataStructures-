@@ -1,267 +1,184 @@
 #include "heder/private_palloc_ip.h"
+#include "test/test.h"
 
 
-
-void*           
-get_mem(size_t size)
+mem_block_t*    
+get_free_mem_block(size_t size)
 {
-    poll_frame_t* frames    = get_poll_frame_struct();
-    void* mem               = NULL;
+    frames_t* frames = get_frames_struct();
 
     for (
-        list_iterator_t* i  = begin_list(frames);
-        i                   != end_list(frames);
+        list_iterator_t* i = begin_list(frames);
+        i != end_list(frames);
         incr_list_itr(&i)
     )
     {
-        mem_frame_t* frame  = GET_LK(mem_frame_t, i);
-        mem                 = find_first_suitable_to_frame(frame, size);
+        frame_t* frame = GET_LK(frame_t, i);
+        
+        mem_block_t* found_block = get_firts_suitable_mem_block(&frame, size);
 
-        if (mem != NULL)
-            return mem;
+        if (found_block != NULL)
+            return found_block;
+
+
+        incr_list_itr(&i);
     }
 
-    return make_new_mem_frame_and_alloc_in_it(frames, size);
+    return make_new_frame_and_alloc_in_it(&frames, size);
 }
 
 
 
 
-void*           
-find_first_suitable_to_frame(mem_frame_t* frame, size_t size)
+mem_block_t*    
+get_firts_suitable_mem_block(frame_t** frame, size_t size)
 {
-    if (size > frame->size_frame)
-        return NULL;
-
-    const size_t count  = frame->count_blocks;
-    void* block         = frame->begin;
+    frame_t* p_frame    = *frame;
+    size_t count        = p_frame->count_blocks;
+    mem_block_t* block  = p_frame->begin;
 
     for (size_t i = 0; i < count; ++i)
     {
-        if (get_status_mem_block(block) == FREE_BLOCK && 
-            get_size_cur_mem_block(block) >= size)
-                return get_block(block);
-        
-        incr_mem_iter(&block);
+        if (is_free_mem_blcok(block) && block->size_block >= size)
+        {
+            block->status = NOT_FREE_BLOCK;
+            return block;
+        }
+
+        inc_mem_blcok_itr(&block);
     }
 
-    return get_block(
-        alloc_block_to_frame(frame, size)
-    );
+    return alloc_mem_block_inside_frame(frame, size);
 }
 
 
-
-void*           
-alloc_block_to_frame(mem_frame_t* frame, size_t size)
+void            
+inc_mem_blcok_itr(mem_block_t** itr)
 {
-    if (frame->size_free_mem <= 0 || frame->size_free_mem < size)
+    size_t size_data = (*itr)->size_block;
+    void* i = (*itr);
+    i += (size_data + SIZE_META_DATA);
+}
+
+
+mem_block_t*    
+alloc_mem_block_inside_frame(frame_t** frame, size_t size)
+{
+    frame_t* pf = *frame;
+
+    if (pf->size_free_mem <= 0 || pf->size_free_mem < size + SIZE_META_DATA)
         return NULL;
 
-    frame->size_free_mem -= size;
-    frame->count_blocks++;
     return make_mem_block(frame, size);
 }
 
 
 
 
-inline
-void*           
-make_new_mem_frame_and_alloc_in_it(poll_frame_t* frames, size_t size)
+mem_block_t*    
+make_mem_block(frame_t** frame, size_t size)
 {
-    push_back_to_list(
-        frames, 
-        make_mem_frame(eval_new_size_for_mem_frame(frames, size))
-    );
+    mem_block_t* free_block     = (mem_block_t*)((*frame)->cur_free_space);
 
-    mem_frame_t* new_frame = GET_LK(mem_frame_t, get_back_from_list(frames));
+    free_block->size_block      = size;
+    free_block->status          = NOT_FREE_BLOCK;
+    free_block->p_frame         = *frame;
 
-    return get_block(
-        alloc_block_to_frame(new_frame, size)
-    );
+
+    (*frame)->size_free_mem     -= size + SIZE_META_DATA;
+    (*frame)->cur_free_space    += size + SIZE_META_DATA;
+    (*frame)->count_blocks++;
+
+    return free_block;
 }
 
 
-mem_frame_t*    
-make_mem_frame(size_t size_frame)
-{
-    mem_frame_t* new_frame      = malloc(SIZE_MEM_FRAME_STRCUT);
-    new_frame->begin            = malloc(size_frame);
 
+frame_t*        
+make_frame(size_t size_frame)
+{
+    frame_t* new_frame          = malloc(SIZE_FRAME_STRUCT);
+
+    new_frame->begin            = malloc(size_frame);
     new_frame->end              = new_frame->begin + size_frame;
     new_frame->cur_free_space   = new_frame->begin;
+
     new_frame->size_frame       = size_frame;
     new_frame->size_free_mem    = size_frame;
+    new_frame->count_blocks     = 0;
 
     return new_frame;
 }
 
 
-void*           
-make_mem_block(mem_frame_t* frame, size_t size)
-{
-    void* mem = frame->cur_free_space;
 
-    set_size_cur_mem_block(mem, size);
-    set_status_mem_block(mem, NOT_FREE_BLOCK);
-    set_size_prev_mem_block(mem, size);
-   
-    return mem;
+mem_block_t*    
+make_new_frame_and_alloc_in_it(frames_t** frames, size_t size)
+{
+    frame_t* new_frame = make_frame(
+        eval_size_new_frame(*frames, size)
+    );
+
+    push_back_to_list(*frames, new_frame);
+
+    return alloc_mem_block_inside_frame(&new_frame, size);
+}
+
+
+void
+free_mem_blcok(mem_block_t** block)
+{
+    (*block)->status = FREE_BLOCK;
+    /* usint two free blocks */
+}
+
+
+void            
+free_frames_struct(void)
+{
+    frames_t* frames = get_frames_struct();
+    free_list(frames);
 }
 
 
 
 
-
-poll_frame_t*   
-get_poll_frame_struct()
+frames_t*       
+get_frames_struct(void)
 {
-    static list_t* poll = NULL;
+    frames_t* frames = NULL;
 
-    if (poll == NULL)
-        poll = init_poll_frame();
-
-    return poll;
-}
-
-
-
-poll_frame_t*            
-init_poll_frame()
-{
-    poll_frame_t* frames = make_std_list();
-    push_back_to_list(frames, make_mem_frame(SIZE_FIRST_MEM_FRAME));
+    if (frames == NULL)
+        init_frames_struct(&frames);
 
     return frames;
 }
 
 
 
-
-
-void*           
-get_block(void* mem)
-{
-    if (mem == NULL)
-        return NULL;
-
-    return get_ptr_on_data(mem);
-}
-
-
-
-inline
-void*           
-get_ptr_on_mem_block_by_ptr_data(void* data)
-{
-    return data - SIZE_STATUS_TYPE - sizeof(size_t);
-}
-
-
-
-inline
-size_t          
-eval_new_size_for_mem_frame(poll_frame_t* frames, size_t size)
-{
-    mem_frame_t* back = GET_LK(mem_frame_t, get_back_from_list(frames));
-
-    return (size + back->size_frame) * 2;
-}
-
-
 void            
-incr_mem_iter(void** cur_block)
+init_frames_struct(frames_t** frames)
 {
-    size_t size_cur_block_data = get_size_cur_mem_block(*cur_block);
-
-    (*cur_block) += ((sizeof(size_t) * 2) + SIZE_STATUS_TYPE + size_cur_block_data);
-}   
-
-
-
-
-inline
-void*           
-get_ptr_on_prev_mem_block(void* mem)
-{
-    size_t size_prev_block_data = *(size_t*)(mem - sizeof(size_t));
-
-    return  (mem - 
-            (sizeof(size_t) * 2) - 
-            size_prev_block_data - 
-            SIZE_STATUS_TYPE);
+    (*frames) = make_std_list();
+    push_back_to_list(*frames, make_frame(START_SIZE_FRAME));
 }
 
 
 
-
-inline
-void*           
-get_ptr_on_data(void* mem)
-{
-    return mem + sizeof(size_t) + SIZE_STATUS_TYPE;
-}
-
-
-inline
 size_t          
-get_size_cur_mem_block(void* mem)
+eval_size_new_frame(frames_t* frames, size_t size)
 {
-    return *(size_t*)(mem);
+    list_iterator_t* p_frame = get_back_from_list(frames);    
+    frame_t* back = *GET_LK(frame_t*, p_frame);
+
+    return (back->size_frame + size) * 2;
 }
-
-
-inline
-size_t          
-get_size_prev_mem_block(void* mem)
-{
-    size_t size_data = get_size_cur_mem_block(mem);
-
-    return *(size_t*)(mem + sizeof(size_t) + SIZE_STATUS_TYPE + size_data);
-}
-
-
-
-inline
-size_t          
-get_status_mem_block(void* mem)
-{
-    return *(status_t*)(mem + sizeof(size_t));
-}
-
-
-inline
-void            
-set_size_cur_mem_block(void* mem, size_t size)
-{
-    *(size_t*)(mem) = size;
-}
-
-
-inline
-void            
-set_size_prev_mem_block(void* mem, size_t size)
-{
-    size_t size_data = get_size_cur_mem_block(mem);
-
-    *(size_t*)(mem + sizeof(size_t) + SIZE_STATUS_TYPE + size_data) = size;
-}
-
-
-inline
-void            
-set_status_mem_block(void* mem, status_t status)
-{
-    *(status_t*)(mem + sizeof(size_t)) = status;
-}
-
 
 
 
 inline
 status_t        
-is_empty_mem_frame(const mem_frame_t* frame)
+is_free_mem_blcok(mem_block_t* block)
 {
-    return frame->begin == frame->cur_free_space;
+    return block->status == FREE_BLOCK;
 }

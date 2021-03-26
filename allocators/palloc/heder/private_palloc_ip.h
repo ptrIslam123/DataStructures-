@@ -2,87 +2,82 @@
 #define _PRIVATE_POLL_ALLOCATOR_H_
 
 #include <stdlib.h>
+#include <stdio.h>
 #include "../../../list/heder/list.h"
 
-#define FREE_BLOCK              (1)
-#define NOT_FREE_BLOCK          (0)
-#define SIZE_FIRST_MEM_FRAME   (1024) 
-#define SIZE_STATUS_TYPE        (sizeof(status_t))
-#define SIZE_MEM_FRAME_STRCUT   (sizeof(struct mem_frame))
-#define SIZE_HEDER_MEM          (sizeof(size_t) * 2 + SIZE_STATUS_TYPE)
+#define START_SIZE_FRAME          (4000)
+#define SIZE_FRAME_STRUCT         (sizeof(struct frame))
+#define SIZE_MEM_BLOCK_STRUCT     (sizeof(struct mem_block))
+#define SIZE_META_DATA            (SIZE_MEM_BLOCK_STRUCT)
+#define FREE_BLOCK                (1)
+#define NOT_FREE_BLOCK            (0)
 
-typedef unsigned char   status_t;
-typedef list_t          poll_frame_t;
+#define GET_PTR_ON_DATA(block)    ((void*)blcok + SIZE_META_DATA)
+#define GET_PTR_ON_MEM_BLCOK(mem) (mem_block_t*)(mem - SIZE_META_DATA)
 
-typedef struct mem_frame
+
+typedef unsigned char status_t;
+typedef list_t        frames_t;
+
+typedef struct frame
 {
-    void*       begin;
-    void*       end;
-    void*       cur_free_space;
+  void*       begin;
+  void*       end;
+  void*       cur_free_space;
 
-    size_t      size_frame;
-    size_t      size_free_mem;
-    size_t      count_blocks;
+  size_t      size_frame;
+  size_t      size_free_mem;
+  size_t      count_blocks;
 
-} mem_frame_t;
-
-
+} frame_t;
 
 
+typedef struct mem_block
+{
+   size_t       size_block;
+   status_t     status;
+   frame_t*     p_frame; 
 
-/*****************************************************
-          struct mem_block
-        
-        -------------------
-        | size_cur_block  |     : size_t
-        -------------------
-        |    status       |     : unsigned char
-        -------------------
-        |        D        |
-        |        A        |     : void*
-        |        T        |
-        |        A        |  
-        -------------------
-        | size_prev_block |     : size_t
-        -------------------
-        |       .         |
-        |       .         |
-        |       .         |  
-*****************************************************/
+} mem_block_t;
 
 
-void*           get_mem(size_t size);
 
-void*           find_first_suitable_to_frame(mem_frame_t* frame, size_t size);
+mem_block_t*    get_free_mem_block(size_t size);
+mem_block_t*    get_firts_suitable_mem_block(frame_t** frame, size_t size);
 
-void*           alloc_block_to_frame(mem_frame_t* frame, size_t size);
+void            inc_mem_blcok_itr(mem_block_t** itr);
 
-void*           make_new_mem_frame_and_alloc_in_it(poll_frame_t* frames, size_t size);
+mem_block_t*    alloc_mem_block_inside_frame(frame_t** frame, size_t size);
 
-mem_frame_t*    make_mem_frame(size_t size_frame);
-void*           make_mem_block(mem_frame_t* frame, size_t size);
+mem_block_t*    make_mem_block(frame_t** frame, size_t size);
 
-poll_frame_t*   get_poll_frame_struct();
-poll_frame_t*   init_poll_frame();
+frame_t*        make_frame(size_t size_frame);
 
-size_t          eval_new_size_for_mem_frame(poll_frame_t* frames, size_t size);
+mem_block_t*    make_new_frame_and_alloc_in_it(frames_t** frames, size_t size);
 
-void            incr_mem_iter(void** mem);
+void            free_mem_blcok(mem_block_t** block);
+void            free_frames_struct(void);
 
-void*           get_block(void* mem);
 
-void*           get_ptr_on_mem_block_by_ptr_data(void* data);
-void*           get_ptr_on_prev_mem_block(void* mem);
-void*           get_ptr_on_data(void* mem);
-size_t          get_size_cur_mem_block(void* mem);
-size_t          get_size_prev_mem_block(void* mem);
-size_t          get_status_mem_block(void* mem);
+frames_t*       get_frames_struct(void);
+void            init_frames_struct(frames_t** frames);
+size_t          eval_size_new_frame(frames_t* frames, size_t size);
 
-void            set_size_cur_mem_block(void* mem, size_t size);
-void            set_size_prev_mem_block(void* mem, size_t size);
-void            set_status_mem_block(void* mem, status_t status);
+status_t        is_free_mem_blcok(mem_block_t* block);
 
-status_t        is_empty_mem_frame(const mem_frame_t* frame);
+
+/*******************************************************************
+ 
+struct frame      |-------|-----------|-----|---------|---------|
+                  |       |mem_block_t|     |  ....   |         |
+                  |-------|-----------|-----|---------|---------|
+                  0       1                                     n -1
+
+
+struct mem_block  
+
+
+*******************************************************************/
 
 #endif // !_PRIVATE_POLL_ALLOCATOR_H_
 
