@@ -35,9 +35,10 @@ test_main(const int size_itreration)
 
 
 void    
-test_print_mem_block(mem_block_t* blcok)
+test_print_mem_block(const char* msg, mem_block_t* blcok)
 {
     printf("{\n");
+    printf("\t&(%s) = %p\n", msg, blcok);
     printf("\tsize_blcok = %d\n\tstatus_block = %d\n\tframe_addr = %p\n",
         blcok->size_block, blcok->status, blcok->p_frame);
     printf("}\n");
@@ -45,16 +46,16 @@ test_print_mem_block(mem_block_t* blcok)
 
 
 void    
-test_print_frame(frame_t* frame)
+test_print_frame(frame_t** frame)
 {
-    size_t size = frame->count_blocks;
-    mem_block_t* it = frame->begin;
+    size_t size = (*frame)->count_blocks;
+    mem_block_t* it = (*frame)->begin;
 
     for (size_t i = 0; i < size; ++i)
     {
-        test_print_mem_block(it);
+        test_print_mem_block("", it);
 
-        inc_mem_blcok_itr(&it);
+        incr_mem_blcok_itr(&it);
     }
 }
 

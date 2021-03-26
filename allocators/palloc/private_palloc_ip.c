@@ -2,6 +2,32 @@
 #include "test/test.h"
 
 
+
+
+void            
+preventing_fragmentation_of_memory(mem_block_t** centr_block)
+{
+    mem_block_t* left_block     = get_ptr_on_prev_mem_block(*centr_block);
+    mem_block_t* right_block    = get_ptr_on_next_mem_block(*centr_block);
+
+    unit_two_blocks_into_one(&left_block, centr_block);
+    unit_two_blocks_into_one(&left_block, &right_block);
+}
+
+
+void            
+unit_two_blocks_into_one(mem_block_t** lblock, mem_block_t** rblock)
+{
+    if (is_free_mem_blcok(*lblock) && is_free_mem_blcok(*rblock))
+    {
+        const size_t total_size_block = ((*lblock)->size_block + (*rblock)->size_block);
+        
+        (*lblock)->size_block = total_size_block;
+        ((*lblock)->p_frame)->count_blocks--;
+    }
+}
+
+
 mem_block_t*    
 get_free_mem_block(size_t size)
 {
@@ -45,20 +71,21 @@ get_firts_suitable_mem_block(frame_t** frame, size_t size)
             return block;
         }
 
-        inc_mem_blcok_itr(&block);
+        incr_mem_blcok_itr(&block);
     }
 
     return alloc_mem_block_inside_frame(frame, size);
 }
 
 
+
+inline
 void            
-inc_mem_blcok_itr(mem_block_t** itr)
+incr_mem_blcok_itr(mem_block_t** itr)
 {
-    size_t size_data = (*itr)->size_block;
-    void* i = (*itr);
-    i += (size_data + SIZE_META_DATA);
+    (*itr) = get_ptr_on_next_mem_block(*itr);
 }
+
 
 
 mem_block_t*    
@@ -129,7 +156,7 @@ void
 free_mem_blcok(mem_block_t** block)
 {
     (*block)->status = FREE_BLOCK;
-    /* usint two free blocks */
+    preventing_fragmentation_of_memory(block);
 }
 
 
@@ -141,6 +168,41 @@ free_frames_struct(void)
 }
 
 
+
+
+
+mem_block_t*    
+get_ptr_on_prev_mem_block(mem_block_t* block)
+{
+    const size_t size_block = block->size_block + SIZE_META_DATA;
+    return (mem_block_t*)( (void*)block - size_block );
+}
+
+
+
+mem_block_t*    
+get_ptr_on_next_mem_block(mem_block_t* block)
+{
+    const size_t size_block = block->size_block + SIZE_META_DATA;
+    return (mem_block_t*)( (void*)block + size_block );
+}
+
+
+inline
+void*           
+get_ptr_on_data(mem_block_t* block)
+{
+    return (void*)( (void*)block + SIZE_META_DATA );
+}
+
+
+
+inline
+mem_block_t*    
+get_ptr_on_mem_block(void* ptr)
+{
+    return (mem_block_t*)( ptr - SIZE_META_DATA );
+}
 
 
 frames_t*       

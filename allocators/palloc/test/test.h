@@ -5,8 +5,8 @@
 
 void    test_main(const int size_itreration);
 
-void    test_print_mem_block(mem_block_t* blcok);
-void    test_print_frame(frame_t* frame);
+void    test_print_mem_block(const char* msg, mem_block_t* blcok);
+void    test_print_frame(frame_t** frame);
 void    test_print_frame_inf(frame_t* frame);
 
 void    test_init_array(int* arr, int size);

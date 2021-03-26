@@ -7,7 +7,7 @@ void*
 palloc(size_t size)
 {
     mem_block_t* free_block = get_free_mem_block(size);
-    return (void*)free_block + SIZE_META_DATA;
+    return get_ptr_on_data(free_block);
 }
 
 
@@ -15,8 +15,8 @@ inline
 void    
 pfree(void* mem)
 {
-    mem_block_t* mblcok = GET_PTR_ON_MEM_BLCOK(mem);
-   free_mem_blcok(&mblcok);
+    mem_block_t* mblcok = get_ptr_on_mem_block(mem);
+    free_mem_blcok(&mblcok);
 }
 
 

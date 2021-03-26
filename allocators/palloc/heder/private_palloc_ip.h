@@ -41,11 +41,14 @@ typedef struct mem_block
 } mem_block_t;
 
 
+void            preventing_fragmentation_of_memory(mem_block_t** centr_block); 
+
+void            unit_two_blocks_into_one(mem_block_t** lblock, mem_block_t** rblock);
 
 mem_block_t*    get_free_mem_block(size_t size);
 mem_block_t*    get_firts_suitable_mem_block(frame_t** frame, size_t size);
 
-void            inc_mem_blcok_itr(mem_block_t** itr);
+void            incr_mem_blcok_itr(mem_block_t** itr);
 
 mem_block_t*    alloc_mem_block_inside_frame(frame_t** frame, size_t size);
 
@@ -58,6 +61,12 @@ mem_block_t*    make_new_frame_and_alloc_in_it(frames_t** frames, size_t size);
 void            free_mem_blcok(mem_block_t** block);
 void            free_frames_struct(void);
 
+
+mem_block_t*    get_ptr_on_prev_mem_block(mem_block_t* block);
+mem_block_t*    get_ptr_on_next_mem_block(mem_block_t* block);
+
+void*           get_ptr_on_data(mem_block_t* block);
+mem_block_t*    get_ptr_on_mem_block(void* ptr);
 
 frames_t*       get_frames_struct(void);
 void            init_frames_struct(frames_t** frames);
@@ -73,8 +82,16 @@ struct frame      |-------|-----------|-----|---------|---------|
                   |-------|-----------|-----|---------|---------|
                   0       1                                     n -1
 
-
-struct mem_block  
+                            
+                  -------------
+struct mem_block  | size_data |
+                  -------------
+                  |   status  |
+                  -------------
+                  | ptr_frame |
+                  -------------
+                  |    DATA   |
+                  -------------
 
 
 *******************************************************************/
