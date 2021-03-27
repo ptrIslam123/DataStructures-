@@ -9,6 +9,24 @@ typedef struct stack
 
 
 
+
+stack_t*            
+init_stack(stack_t* stack, struct init_list* init)
+{
+    const size_t size       = init->size_data;
+    const size_t size_type  = init->size_dataa_type;
+    init_list_value_t data  = init->data;
+
+    for (int i = 0; i < size; ++i)
+    {
+        push_to_stack(stack, data);
+        data += size_type;
+    }
+
+    return stack;
+}
+
+
 inline
 unsigned char       
 is_empty_stack(stack_t* stack)
