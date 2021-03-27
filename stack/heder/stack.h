@@ -2,6 +2,7 @@
 #define _STACK_STRUCT_H_
 
 #include <stdlib.h>
+#include "../../clib/heder/clib.h"
 
 struct stack;
 typedef struct stack stack_t;
@@ -11,6 +12,9 @@ typedef void* stack_value_t;
 
 #define SIZE_STACK_STRCUT   (sizeof(struct stack))
 #define GET_SV(T,V)         ((T*)V)
+
+
+stack_t*            init_stack(stack_t* stack, struct init_list* init);
 
 
 unsigned char       is_empty_stack(stack_t* );
