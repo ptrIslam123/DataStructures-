@@ -2,6 +2,24 @@
 #include "heder/private_tree_ip.h"
 #include <stdio.h>
 
+
+tree_t*             
+init_tree(tree_t* tree, struct init_list* init)
+{
+    const size_t size       = init->size_data;
+    const size_t size_type  = init->size_dataa_type;
+    init_list_value_t data  = init->data;
+
+    for (int i = 0; i < size; ++i)
+    {
+        insert_to_tree(tree, data);
+        data += size_type;
+    }
+
+    return tree;
+}
+
+
 inline
 unsigned char   
 is_empty_tree(tree_t* tree)
@@ -162,9 +180,11 @@ make_tree(allocator_t allocate, deallocator_t deallocate,
 void            
 free_tree(tree_t* tree)
 {
-    //for_each_node_to_tree(tree, tree->root, clear_node_to_tree ,NULL);
+    if (is_empty_tree(tree))
+        return;
 
-    tree->deallocate(tree);
+    _free_tree(tree, tree->root);
+    free(tree);
     tree = NULL;
 }
 
