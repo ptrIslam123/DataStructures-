@@ -9,6 +9,24 @@ typedef struct queue
 
 
 
+
+
+queue_t*            
+init_queue(queue_t* queue, struct init_list* init)
+{
+    const size_t size       = init->size_data;
+    const size_t size_type  = init->size_dataa_type;
+    init_list_value_t data  = init->data;
+
+    for (int i = 0; i < size; ++i)
+    {
+        push_to_queue(queue, data);
+        data += size_type;
+    }
+
+    return queue;
+}
+
 inline
 unsigned char       
 is_empty_queue(queue_t* queue)
