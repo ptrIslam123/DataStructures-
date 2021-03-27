@@ -2,6 +2,7 @@
 #define _AVL_TREE_STRUCT_H_
 
 #include <stdlib.h>
+#include "../../clib/heder/clib.h"
 
 
 #define SIZE_AVL_TREE_NODE      (sizeof(struct avl_tree_node))
@@ -54,6 +55,8 @@ typedef struct avl_tree_node
 //      GET_AVL_TREE_KEY | KEY <-> DATA
 #define GET_ATK(T, avl_tree_itr) ((T*)avl_tree_itr->data)
 
+
+avl_tree_t*             init_avl_tree(avl_tree_t* tree, struct init_list* init);
 
 unsigned char           is_empty_avl_tree(avl_tree_t* );
 
