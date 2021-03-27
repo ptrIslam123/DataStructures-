@@ -2,6 +2,7 @@
 #define _TREE_H_
 
 #include <stdlib.h>
+#include "../../clib/heder/clib.h"
 
 #define SIZE_TREE_NODE      (sizeof(struct tree_node))
 #define SIZE_TREE_STRCUT    (sizeof(struct tree))
@@ -52,6 +53,8 @@ typedef struct tree_node
 //      GET_TREE_KEY | KEY <-> DATA
 #define GET_TK(T, tree_itr) ((T*)tree_itr->data)
 
+
+tree_t*             init_tree(tree_t* tree, struct init_list* init);
 
 unsigned char       is_empty_tree(tree_t* );
 

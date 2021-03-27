@@ -15,6 +15,8 @@ void                insert_node_to_tree(tree_t* , tree_node_t** , tree_node_t** 
 struct tree_node*   make_tree_node(allocator_t , tree_value_t );
 void                free_tree_node(deallocator_t , struct tree_node** );
 
+void                _free_tree(tree_t* , tree_node_t* );
+
 void                clear_node_to_tree(tree_t* , tree_iterator_t** , void** );
 
 

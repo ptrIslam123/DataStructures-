@@ -127,3 +127,28 @@ free_tree_node(deallocator_t deallocate, struct tree_node** node)
 
 
 
+void                
+_free_tree(tree_t* tree, tree_node_t* root)
+{
+    tree_node_t* left = root->left_node;
+    tree_node_t* right = root->right_node;
+
+    if (left != NULL && right != NULL)
+    {
+        _free_tree(tree, root->left_node);
+        _free_tree(tree, root->right_node);
+    }
+    else if (left != NULL && right == NULL)
+    {
+        _free_tree(tree, root->left_node);
+    }
+    else if (left == NULL && right != NULL)
+    {
+        _free_tree(tree, root->right_node);
+    }
+
+    tree->deallocate(root);
+    tree->size_tree--;
+}
+
+

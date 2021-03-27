@@ -20,25 +20,6 @@ int main()
 {
 
     
-    int arr[] = {5, 2 , 3, 4, 8, 6, 9, 1};
-    const int size = sizeof(arr)/sizeof(arr[0]);
-
-    tree_t* tree = make_std_tree(is_eqi, is_lessi, is_morei);
-
-    for (int i = 0; i < size; ++i)
-    {
-        int* v = malloc(sizeof(int));
-        *v = arr[i];
-        insert_to_tree(tree, v);
-    }
-
-
-    for_each_tree(tree, print_tree_node, NULL);
-    
-    
-
-
-    
     
 
     return 0;
