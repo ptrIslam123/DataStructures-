@@ -3,6 +3,7 @@
 
 
 #include <stdlib.h>
+#include "../../clib/heder/clib.h"
 
 struct queue;
 typedef struct queue queue_t;
@@ -13,6 +14,8 @@ typedef void* queue_value_t;
 #define SIZE_QUEUE_STRCUT   (sizeof(struct queue))
 #define GET_QV(T,V)         ((T*)V)
 
+
+queue_t*            init_queue(queue_t* queue, struct init_list* init);
 
 unsigned char       is_empty_queue(queue_t* );
 
