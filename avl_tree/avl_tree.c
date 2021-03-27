@@ -2,6 +2,24 @@
 #include "heder/avl_tree.h"
 #include "heder/private_avl_tree_ip.h"
 
+
+
+avl_tree_t*             
+init_avl_tree(avl_tree_t* tree, struct init_list* init)
+{
+    const size_t size       = init->size_data;
+    const size_t size_type  = init->size_dataa_type;
+    init_list_value_t data  = init->data;
+
+    for (int i = 0; i < size; ++i)
+    {
+        insert_to_avl_tree(tree, data);
+        data += size_type;
+    }
+
+    return tree;
+}
+
 inline
 unsigned char           
 is_empty_avl_tree(avl_tree_t* tree)
